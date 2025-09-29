@@ -6,13 +6,13 @@ export default function ModelSelectionStep({ onComplete }) {
 
   const models = [
     {
-      id: 'models/gemini-2.5-flash',
+      id: 'gemini-2.5-flash',
       name: 'Gemini Flash 2.5',
       description: 'Fast and cost-effective processing',
       badge: 'Cheap & Quick',
     },
     {
-      id: 'models/gemini-2.5-pro',
+      id: 'gemini-2.5-pro',
       name: 'Gemini Pro 2.5',
       description: 'Maximum accuracy for complex tagging',
       badge: 'Accurate & Slow',

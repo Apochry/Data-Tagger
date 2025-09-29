@@ -38,6 +38,13 @@ export default function ProcessingStep({
 
   const processData = async () => {
     try {
+      console.log('=== STARTING PROCESSING ===')
+      console.log('Selected Model:', selectedModel)
+      console.log('API Key length:', apiKey?.length || 0)
+      console.log('Total rows to process:', csvData.length)
+      console.log('Selected column:', selectedColumn)
+      console.log('Tags defined:', tags.map(t => t.name).join(', '))
+      
       const genAI = new GoogleGenerativeAI(apiKey)
       const model = genAI.getGenerativeModel({ model: selectedModel })
 
@@ -53,6 +60,7 @@ export default function ProcessingStep({
         .join('\n\n')
 
       const tagNames = tags.map((t) => t.name)
+      console.log('Tag names for validation:', tagNames)
 
       // Process each row
       const processedData = []
@@ -82,7 +90,11 @@ export default function ProcessingStep({
         setCurrentRow(i + 1)
         setStatus(`Processing row ${i + 1} of ${totalRows}...`)
 
+        console.log(`\n--- Processing Row ${i + 1}/${totalRows} ---`)
+        console.log('Comment:', comment?.substring(0, 100) + (comment?.length > 100 ? '...' : ''))
+
         if (!comment || comment.trim() === '') {
+          console.log('Skipping empty comment')
           // Handle empty comments
           const newRow = { ...row }
           newRow['AI_Tags'] = ''
@@ -113,16 +125,45 @@ COMMENT TO ANALYZE:
 
 YOUR RESPONSE (comma-separated tag names only):`.trim()
 
+          if (i === 0) {
+            // Log the full prompt for the first row to help with debugging
+            console.log('Prompt template (first row):', prompt.substring(0, 500) + '...')
+          }
+
+          console.log('Sending request to Gemini API...')
           const result = await model.generateContent(prompt)
           const response = await result.response
           const text = response.text().trim()
 
-          // Parse the response - be more flexible with parsing
-          const appliedTags = text
+          console.log('Raw API response:', text)
+
+          // Parse the response - be more flexible with parsing (case-insensitive)
+          const parsedTags = text
             .split(',')
             .map((t) => t.trim())
             .map((t) => t.replace(/^["']|["']$/g, '')) // Remove quotes if present
-            .filter((t) => t && tagNames.includes(t)) // Only include valid tag names
+            .filter((t) => t) // Remove empty strings
+
+          console.log('Parsed tags before validation:', parsedTags)
+
+          // Match tags case-insensitively and use the original tag names
+          const appliedTags = []
+          parsedTags.forEach((parsedTag) => {
+            const matchingTag = tagNames.find(
+              (tagName) => tagName.toLowerCase() === parsedTag.toLowerCase()
+            )
+            if (matchingTag && !appliedTags.includes(matchingTag)) {
+              appliedTags.push(matchingTag)
+            }
+          })
+
+          console.log('Valid tags applied:', appliedTags.length > 0 ? appliedTags.join(', ') : 'NONE')
+          if (parsedTags.length > appliedTags.length) {
+            const unmatched = parsedTags.filter(
+              (pt) => !tagNames.find((tn) => tn.toLowerCase() === pt.toLowerCase())
+            )
+            console.warn('⚠️ Unmatched tags from AI (not in tag list):', unmatched)
+          }
 
           // Create new row with tags
           const newRow = { ...row }
@@ -130,12 +171,22 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
 
           // Add binary columns for each tag
           tags.forEach((tag) => {
-            newRow[`Tag_${tag.name}`] = appliedTags.includes(tag.name) ? 1 : 0
+            const isApplied = appliedTags.includes(tag.name)
+            newRow[`Tag_${tag.name}`] = isApplied ? 1 : 0
+            if (isApplied) {
+              console.log(`  ✓ Tag applied: ${tag.name}`)
+            }
           })
 
           processedData.push(newRow)
+          console.log('Row processed successfully')
         } catch (err) {
-          console.error('Error processing row:', err)
+          console.error('❌ ERROR processing row:', err)
+          console.error('Error details:', {
+            message: err.message,
+            name: err.name,
+            stack: err.stack?.substring(0, 200)
+          })
           // On error, add row with empty tags
           const newRow = { ...row }
           newRow['AI_Tags'] = ''
@@ -152,11 +203,20 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
         await new Promise((resolve) => setTimeout(resolve, 500))
       }
 
+      console.log('\n=== PROCESSING COMPLETE ===')
+      console.log('Total rows processed:', processedData.length)
+      console.log('Processed data sample:', processedData.slice(0, 2))
+      
       setStatus('Processing complete!')
       setIsProcessing(false)
       onComplete(processedData)
     } catch (err) {
-      console.error('Processing error:', err)
+      console.error('❌ FATAL PROCESSING ERROR:', err)
+      console.error('Error details:', {
+        message: err.message,
+        name: err.name,
+        stack: err.stack
+      })
       setError(err.message)
       setStatus('Error occurred during processing')
       setIsProcessing(false)
