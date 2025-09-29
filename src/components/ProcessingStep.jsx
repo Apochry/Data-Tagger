@@ -169,12 +169,12 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
           const newRow = { ...row }
           newRow['AI_Tags'] = appliedTags.join(', ')
 
-          // Add binary columns for each tag
+          // Add binary columns for each tag (exact match only)
           tags.forEach((tag) => {
             const isApplied = appliedTags.includes(tag.name)
             newRow[`Tag_${tag.name}`] = isApplied ? 1 : 0
             if (isApplied) {
-              console.log(`  ✓ Tag applied: ${tag.name}`)
+              console.log(`  ✓ Tag applied: "${tag.name}" (exact match)`)
             }
           })
 
