@@ -108,7 +108,7 @@ function App() {
       <header className="border-b border-gray-200 bg-white">
         <div className="max-w-6xl mx-auto px-8 py-8">
           <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-            AI Tagger
+            Data Tagger
           </h1>
           <p className="text-gray-600 mt-2 font-light">
             Classify survey responses with AI
