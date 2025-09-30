@@ -1,14 +1,32 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export default function TagDefinitionStep({ onComplete }) {
-  const [tags, setTags] = useState([
-    {
-      id: Date.now(),
-      name: '',
-      description: '',
-      examples: [''],
-    },
-  ])
+export default function TagDefinitionStep({ onComplete, initialTags, onClearAll }) {
+  const [tags, setTags] = useState(() => {
+    // Use initialTags if provided and not empty, otherwise use default empty tag
+    if (initialTags && initialTags.length > 0) {
+      console.log('📋 Loading saved tags from localStorage:', initialTags.length, 'tags')
+      return initialTags
+    }
+    console.log('📋 Starting with empty tag template')
+    return [
+      {
+        id: Date.now(),
+        name: '',
+        description: '',
+        examples: [''],
+      },
+    ]
+  })
+
+  // Autosave tags to localStorage whenever they change
+  useEffect(() => {
+    // Only save if there's at least one tag with a name (don't save empty template)
+    const hasContent = tags.some(tag => tag.name.trim() !== '' || tag.description.trim() !== '' || tag.examples.some(ex => ex.trim() !== ''))
+    if (hasContent) {
+      console.log('💾 Autosaving tags to localStorage:', tags.length, 'tags')
+      localStorage.setItem('aiTagger_tags', JSON.stringify(tags))
+    }
+  }, [tags])
 
   const addTag = () => {
     setTags([
@@ -80,14 +98,43 @@ export default function TagDefinitionStep({ onComplete }) {
     onComplete(cleanedTags)
   }
 
+  const handleDeleteAll = () => {
+    if (window.confirm('Are you sure you want to delete all saved tags? This cannot be undone.')) {
+      setTags([
+        {
+          id: Date.now(),
+          name: '',
+          description: '',
+          examples: [''],
+        },
+      ])
+      if (onClearAll) {
+        onClearAll()
+      }
+    }
+  }
+
   return (
     <div className="p-12">
-      <h2 className="text-3xl font-bold text-gray-900 mb-3">Define Your Tags</h2>
-      <p className="text-gray-600 mb-8 font-light">
-        Create the classification structure for your survey responses
-      </p>
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900">Define Your Tags</h2>
+          <p className="text-gray-600 mt-2 font-light">
+            Create the classification structure for your survey responses
+          </p>
+        </div>
+        {initialTags && initialTags.length > 0 && (
+          <button
+            onClick={handleDeleteAll}
+            className="px-4 py-2 text-sm text-red-600 hover:text-red-700 border border-red-300 rounded-sm hover:border-red-400 transition-colors"
+            title="Delete all saved tags"
+          >
+            Delete All
+          </button>
+        )}
+      </div>
 
-      <div className="space-y-6 mb-8">
+      <div className="space-y-6 mb-8 mt-8">
         {tags.map((tag, tagIndex) => (
           <div
             key={tag.id}

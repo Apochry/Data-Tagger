@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProgressStepper from './components/ProgressStepper'
 import UploadStep from './components/UploadStep'
 import TagDefinitionStep from './components/TagDefinitionStep'
@@ -7,12 +7,32 @@ import ProcessingStep from './components/ProcessingStep'
 import CompletionStep from './components/CompletionStep'
 
 function App() {
-  const [currentStep, setCurrentStep] = useState(0)
-  const [csvData, setCsvData] = useState(null)
-  const [selectedColumn, setSelectedColumn] = useState(null)
-  const [tags, setTags] = useState([])
+  // Load initial state from localStorage
+  const [currentStep, setCurrentStep] = useState(() => {
+    const saved = localStorage.getItem('aiTagger_currentStep')
+    return saved ? parseInt(saved) : 0
+  })
+  
+  const [csvData, setCsvData] = useState(() => {
+    const saved = localStorage.getItem('aiTagger_csvData')
+    return saved ? JSON.parse(saved) : null
+  })
+  
+  const [selectedColumn, setSelectedColumn] = useState(() => {
+    const saved = localStorage.getItem('aiTagger_selectedColumn')
+    return saved || null
+  })
+  
+  const [tags, setTags] = useState(() => {
+    const saved = localStorage.getItem('aiTagger_tags')
+    const parsed = saved ? JSON.parse(saved) : []
+    console.log('💾 Loading tags from localStorage:', parsed.length, 'tags found')
+    return parsed
+  })
+  
   const [apiKey, setApiKey] = useState('')
   const [selectedModel, setSelectedModel] = useState('')
+  const [selectedProvider, setSelectedProvider] = useState('')
   const [processedData, setProcessedData] = useState(null)
 
   const steps = [
@@ -22,6 +42,30 @@ function App() {
     { label: 'Process', description: 'Tag responses' },
     { label: 'Download', description: 'Export results' },
   ]
+
+  // Save to localStorage when state changes
+  useEffect(() => {
+    localStorage.setItem('aiTagger_currentStep', currentStep.toString())
+  }, [currentStep])
+
+  useEffect(() => {
+    if (csvData) {
+      localStorage.setItem('aiTagger_csvData', JSON.stringify(csvData))
+    }
+  }, [csvData])
+
+  useEffect(() => {
+    if (selectedColumn) {
+      localStorage.setItem('aiTagger_selectedColumn', selectedColumn)
+    }
+  }, [selectedColumn])
+
+  useEffect(() => {
+    if (tags.length > 0) {
+      console.log('💾 Saving tags to localStorage:', tags.length, 'tags')
+      localStorage.setItem('aiTagger_tags', JSON.stringify(tags))
+    }
+  }, [tags])
 
   const handleUploadComplete = (data, column) => {
     setCsvData(data)
@@ -34,9 +78,10 @@ function App() {
     setCurrentStep(2)
   }
 
-  const handleModelComplete = (key, model) => {
+  const handleModelComplete = (key, model, provider) => {
     setApiKey(key)
     setSelectedModel(model)
+    setSelectedProvider(provider)
     setCurrentStep(3)
   }
 
@@ -45,23 +90,39 @@ function App() {
     setCurrentStep(4)
   }
 
+  const handleStepClick = (stepIndex) => {
+    // Allow navigation back to any completed step
+    // State is preserved, so user can review/modify previous choices
+    setCurrentStep(stepIndex)
+  }
+
+  const clearAllTags = () => {
+    // Clear tags from localStorage and state
+    localStorage.removeItem('aiTagger_tags')
+    setTags([])
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
         <div className="max-w-6xl mx-auto px-8 py-8">
           <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-            AI Tagger
+            AI Tagging
           </h1>
           <p className="text-gray-600 mt-2 font-light">
-            Intelligent survey response classification
+            Survey response classification
           </p>
         </div>
       </header>
 
       {/* Progress Stepper */}
       <div className="max-w-6xl mx-auto px-8 py-12">
-        <ProgressStepper steps={steps} currentStep={currentStep} />
+        <ProgressStepper 
+          steps={steps} 
+          currentStep={currentStep} 
+          onStepClick={handleStepClick}
+        />
       </div>
 
       {/* Main Content */}
@@ -71,10 +132,19 @@ function App() {
             <UploadStep onComplete={handleUploadComplete} />
           )}
           {currentStep === 1 && (
-            <TagDefinitionStep onComplete={handleTagsComplete} />
+            <TagDefinitionStep 
+              onComplete={handleTagsComplete}
+              initialTags={tags}
+              onClearAll={clearAllTags}
+            />
           )}
           {currentStep === 2 && (
-            <ModelSelectionStep onComplete={handleModelComplete} />
+            <ModelSelectionStep 
+              onComplete={handleModelComplete}
+              csvData={csvData}
+              selectedColumn={selectedColumn}
+              tags={tags}
+            />
           )}
           {currentStep === 3 && (
             <ProcessingStep
@@ -83,6 +153,7 @@ function App() {
               tags={tags}
               apiKey={apiKey}
               selectedModel={selectedModel}
+              selectedProvider={selectedProvider}
               onComplete={handleProcessingComplete}
             />
           )}
@@ -96,7 +167,7 @@ function App() {
       <footer className="border-t border-gray-200 bg-white mt-16">
         <div className="max-w-6xl mx-auto px-8 py-8">
           <p className="text-center text-gray-500 text-sm font-light">
-            Powered by Google Gemini AI
+            AI-powered survey response classification
           </p>
         </div>
       </footer>

@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export default function ProcessingStep({
   csvData,
@@ -7,6 +6,7 @@ export default function ProcessingStep({
   tags,
   apiKey,
   selectedModel,
+  selectedProvider,
   onComplete,
 }) {
   const [progress, setProgress] = useState(0)
@@ -17,8 +17,12 @@ export default function ProcessingStep({
   const [isProcessing, setIsProcessing] = useState(true)
   const shouldStopRef = useRef(false)
   const shouldPauseRef = useRef(false)
+  const hasStartedRef = useRef(false)
 
   useEffect(() => {
+    // Prevent duplicate runs (React Strict Mode in dev triggers useEffect twice)
+    if (hasStartedRef.current) return
+    hasStartedRef.current = true
     processData()
   }, [])
 
@@ -36,17 +40,103 @@ export default function ProcessingStep({
     }
   }
 
+  // Call the appropriate AI provider
+  const callAI = async (prompt) => {
+    console.log(`Calling ${selectedProvider} API...`)
+    
+    switch (selectedProvider) {
+      case 'google':
+        return await callGoogleAI(prompt)
+      case 'openrouter':
+        return await callOpenRouterAI(prompt)
+      case 'openai':
+        return await callOpenAI(prompt)
+      default:
+        throw new Error(`Unknown provider: ${selectedProvider}`)
+    }
+  }
+
+  const callGoogleAI = async (prompt) => {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: prompt }]
+          }]
+        })
+      }
+    )
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error?.message || `API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+  }
+
+  const callOpenRouterAI = async (prompt) => {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'AI Tagger',
+      },
+      body: JSON.stringify({
+        model: selectedModel,
+        messages: [{ role: 'user', content: prompt }],
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error?.message || `API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.choices?.[0]?.message?.content || ''
+  }
+
+  const callOpenAI = async (prompt) => {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: selectedModel,
+        messages: [{ role: 'user', content: prompt }],
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error?.message || `API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.choices?.[0]?.message?.content || ''
+  }
+
   const processData = async () => {
     try {
       console.log('=== STARTING PROCESSING ===')
+      console.log('Provider:', selectedProvider)
       console.log('Selected Model:', selectedModel)
       console.log('API Key length:', apiKey?.length || 0)
       console.log('Total rows to process:', csvData.length)
       console.log('Selected column:', selectedColumn)
       console.log('Tags defined:', tags.map(t => t.name).join(', '))
-      
-      const genAI = new GoogleGenerativeAI(apiKey)
-      const model = genAI.getGenerativeModel({ model: selectedModel })
 
       // Create a comprehensive prompt with tag definitions
       const tagDefinitions = tags
@@ -130,10 +220,34 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
             console.log('Prompt template (first row):', prompt.substring(0, 500) + '...')
           }
 
-          console.log('Sending request to Gemini API...')
-          const result = await model.generateContent(prompt)
-          const response = await result.response
-          const text = response.text().trim()
+          console.log('Sending request to AI API...')
+          
+          // Retry logic with exponential backoff for rate limits
+          let text = ''
+          let retryCount = 0
+          const maxRetries = 3
+          
+          while (retryCount <= maxRetries) {
+            try {
+              text = await callAI(prompt)
+              break // Success, exit retry loop
+            } catch (apiError) {
+              // Check if it's a rate limit error (429)
+              if (apiError.message.includes('429') || apiError.message.includes('quota') || apiError.message.includes('rate limit')) {
+                if (retryCount < maxRetries) {
+                  const waitTime = Math.pow(2, retryCount) * 1000 // Exponential backoff: 1s, 2s, 4s
+                  console.warn(`⚠️ Rate limit hit, retrying in ${waitTime/1000}s... (attempt ${retryCount + 1}/${maxRetries})`)
+                  setStatus(`Rate limited. Retrying row ${i + 1} in ${waitTime/1000}s...`)
+                  await new Promise(resolve => setTimeout(resolve, waitTime))
+                  retryCount++
+                } else {
+                  throw apiError // Max retries exceeded
+                }
+              } else {
+                throw apiError // Not a rate limit error, throw immediately
+              }
+            }
+          }
 
           console.log('Raw API response:', text)
 
@@ -187,7 +301,32 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
             name: err.name,
             stack: err.stack?.substring(0, 200)
           })
-          // On error, add row with empty tags
+          
+          // Check if it's a critical error that should stop processing
+          const isCriticalError = err.message.includes('quota') || err.message.includes('429')
+          if (isCriticalError) {
+            console.error('💥 Critical error detected (quota/rate limit). Stopping processing.')
+            setError(`API Error: ${err.message}. Processing stopped at row ${i + 1}.`)
+            setStatus('Processing stopped due to API error')
+            setIsProcessing(false)
+            
+            // Add remaining rows with error markers
+            for (let j = i; j < totalRows; j++) {
+              const errorRow = { ...csvData[j] }
+              errorRow['AI_Tags'] = ''
+              errorRow['AI_Error'] = 'Processing stopped due to API quota/rate limit'
+              tags.forEach((tag) => {
+                errorRow[`Tag_${tag.name}`] = 0
+              })
+              processedData.push(errorRow)
+            }
+            
+            // Still return partial results
+            onComplete(processedData)
+            return
+          }
+          
+          // On non-critical error, add row with empty tags and continue
           const newRow = { ...row }
           newRow['AI_Tags'] = ''
           newRow['AI_Error'] = err.message

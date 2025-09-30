@@ -1,18 +1,40 @@
 {
   "name": "ai-tagger",
-  "private": true,
+  "private": false,
   "version": "1.0.0",
+  "description": "AI-powered survey response tagging with multi-provider support (Google AI, OpenAI, OpenRouter)",
   "type": "module",
+  "keywords": [
+    "ai",
+    "tagging",
+    "survey",
+    "nlp",
+    "gemini",
+    "openai",
+    "openrouter",
+    "classification",
+    "csv",
+    "survey-analysis"
+  ],
+  "author": "AI Tagger Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ai-tagger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ai-tagger/issues"
+  },
+  "homepage": "https://github.com/yourusername/ai-tagger#readme",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "papaparse": "^5.4.1",
-    "@google/generative-ai": "^0.21.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
