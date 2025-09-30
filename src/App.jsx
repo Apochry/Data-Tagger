@@ -167,7 +167,17 @@ function App() {
       <footer className="border-t border-gray-200 bg-white mt-16">
         <div className="max-w-6xl mx-auto px-8 py-8">
           <p className="text-center text-gray-500 text-sm font-light">
-            No API keys are stored or shared. Your data is processed locally.
+            Open source AI tagging tool. No API keys are stored or shared - your data is processed locally.
+          </p>
+          <p className="text-center text-gray-400 text-xs mt-2">
+            <a 
+              href="https://github.com/Apochry/Data-Tagger" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-gray-600 underline transition-colors"
+            >
+              View on GitHub
+            </a>
           </p>
         </div>
       </footer>
