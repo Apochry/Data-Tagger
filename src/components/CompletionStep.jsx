@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 
-export default function CompletionStep({ processedData }) {
+export default function CompletionStep({ processedData, tags }) {
   const handleDownload = () => {
     const csv = Papa.unparse(processedData)
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -20,15 +20,11 @@ export default function CompletionStep({ processedData }) {
     (row) => row.AI_Tags && row.AI_Tags.trim() !== ''
   ).length
 
-  // Get all tag columns
-  const tagColumns = Object.keys(processedData[0] || {}).filter((key) =>
-    key.startsWith('Tag_')
-  )
-
-  const tagStats = tagColumns.map((col) => {
-    const count = processedData.filter((row) => row[col] === 1).length
+  // Calculate statistics for each tag
+  const tagStats = tags.map((tag) => {
+    const count = processedData.filter((row) => row[tag.name] === 1).length
     return {
-      name: col.replace('Tag_', ''),
+      name: tag.name,
       count,
       percentage: ((count / totalRows) * 100).toFixed(1),
     }
@@ -116,7 +112,7 @@ export default function CompletionStep({ processedData }) {
           Download Tagged CSV
         </button>
         <p className="text-center text-sm text-gray-500 mt-4">
-          Your data includes original columns plus AI_Tags and binary tag columns
+          CSV includes original columns, AI_Tags column, and binary columns for each tag
         </p>
       </div>
     </div>

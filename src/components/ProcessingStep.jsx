@@ -189,7 +189,7 @@ export default function ProcessingStep({
           const newRow = { ...row }
           newRow['AI_Tags'] = ''
           tags.forEach((tag) => {
-            newRow[`Tag_${tag.name}`] = 0
+            newRow[tag.name] = 0
           })
           processedData.push(newRow)
           setProgress(((i + 1) / totalRows) * 100)
@@ -286,7 +286,7 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
           // Add binary columns for each tag (exact match only)
           tags.forEach((tag) => {
             const isApplied = appliedTags.includes(tag.name)
-            newRow[`Tag_${tag.name}`] = isApplied ? 1 : 0
+            newRow[tag.name] = isApplied ? 1 : 0
             if (isApplied) {
               console.log(`  ✓ Tag applied: "${tag.name}" (exact match)`)
             }
@@ -316,7 +316,7 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
               errorRow['AI_Tags'] = ''
               errorRow['AI_Error'] = 'Processing stopped due to API quota/rate limit'
               tags.forEach((tag) => {
-                errorRow[`Tag_${tag.name}`] = 0
+                errorRow[tag.name] = 0
               })
               processedData.push(errorRow)
             }
@@ -331,7 +331,7 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
           newRow['AI_Tags'] = ''
           newRow['AI_Error'] = err.message
           tags.forEach((tag) => {
-            newRow[`Tag_${tag.name}`] = 0
+            newRow[tag.name] = 0
           })
           processedData.push(newRow)
         }

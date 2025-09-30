@@ -158,7 +158,7 @@ function App() {
             />
           )}
           {currentStep === 4 && (
-            <CompletionStep processedData={processedData} />
+            <CompletionStep processedData={processedData} tags={tags} />
           )}
         </div>
       </main>
