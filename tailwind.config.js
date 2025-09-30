@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'serif': ['Playfair Display', 'Georgia', 'serif'],
+        'display': ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
         'sans': ['Inter', 'system-ui', 'sans-serif'],
       },
     },
