@@ -108,10 +108,10 @@ function App() {
       <header className="border-b border-gray-200 bg-white">
         <div className="max-w-6xl mx-auto px-8 py-8">
           <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-            AI Tagging
+            AI Tagger
           </h1>
           <p className="text-gray-600 mt-2 font-light">
-            Survey response classification
+            Classify survey responses with AI
           </p>
         </div>
       </header>
@@ -167,7 +167,7 @@ function App() {
       <footer className="border-t border-gray-200 bg-white mt-16">
         <div className="max-w-6xl mx-auto px-8 py-8">
           <p className="text-center text-gray-500 text-sm font-light">
-            AI-powered survey response classification
+            No API keys are stored or shared. Your data is processed locally.
           </p>
         </div>
       </footer>
