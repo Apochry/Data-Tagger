@@ -76,8 +76,8 @@ output = {
   csv_data: csvData,
   column: "Customer Comment",
   tags: tags,
-  ai_provider: "openai",
-  ai_model: "gpt-4o-mini"
+  ai_provider: "google",
+  ai_model: "gemini-2.0-flash-exp"
 };
 ```
 
@@ -91,7 +91,7 @@ output = {
   - column: (from Code step output)
   - tags: (from Code step output)
   - ai_provider: (from Code step output)
-  - ai_api_key: `{{storage.openai_key}}` (stored in Zapier Storage)
+  - ai_api_key: `{{storage.gemini_key}}` (stored in Zapier Storage)
   - ai_model: (from Code step output)
 - **Headers**:
   - Content-Type: `application/json`
@@ -155,12 +155,13 @@ Before testing, store your AI provider API key securely:
 
 1. Go to https://zapier.com/app/storage
 2. Add new storage item:
-   - Key: `openai_key`, Value: (your OpenAI API key)
+   - Key: `gemini_key`, Value: (your Gemini API key from https://aistudio.google.com/app/apikey)
    
 **Why use Storage?**
 - Keeps your key secure and private
 - Easy to update in one place
-- Reference it in any Zap as `{{storage.openai_key}}`
+- Reference it in any Zap as `{{storage.gemini_key}}`
+- **Free tier**: Gemini offers a generous free tier for testing!
 
 ### 4. Test the Zap
 
@@ -232,11 +233,11 @@ output = {
   - 1000 responses = 5000 tasks
   - Need Professional plan: $49/month
 
-- OpenAI (GPT-4o-mini):
-  - ~$0.00015 per response
-  - 1000 responses: ~$0.15
+- Google Gemini (gemini-2.0-flash-exp):
+  - **FREE** up to 1,500 requests per day
+  - 1000 responses: **$0.00** (free tier!)
 
-**Total: ~$49.15/month for 1,000 responses**
+**Total: ~$49/month for 1,000 responses** (just Zapier, AI is free!)
 
 **With batch processing (100 rows at once):**
 - 1000 responses / 100 = 10 Zap runs

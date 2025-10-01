@@ -99,16 +99,30 @@ Run these tests before going live:
 curl -X POST https://data-tagger.vercel.app/api/tag \
   -H "Content-Type: application/json" \
   -d '{
-    "csv_data": "ID,Comment\n1,Great!",
+    "csv_data": "ID,Comment\n1,Great service!",
     "column": "Comment",
     "tags": [{"name": "Positive", "description": "Positive feedback"}],
-    "ai_provider": "openai",
-    "ai_api_key": "YOUR_REAL_KEY",
-    "ai_model": "gpt-4o-mini"
+    "ai_provider": "google",
+    "ai_api_key": "YOUR_GEMINI_API_KEY",
+    "ai_model": "gemini-2.0-flash-exp"
   }'
 
+# Get your free Gemini API key at: https://aistudio.google.com/app/apikey
+
 # Test 2: Rate limiting (run 11 times quickly)
-for i in {1..11}; do curl -X POST ...; done
+# Run this 11 times to test rate limiting
+for i in {1..11}; do 
+  curl -X POST https://data-tagger.vercel.app/api/tag \
+    -H "Content-Type: application/json" \
+    -d '{
+      "csv_data": "ID,C\n1,test",
+      "column": "C",
+      "tags": [{"name": "Test", "description": "Test tag"}],
+      "ai_provider": "google",
+      "ai_api_key": "YOUR_GEMINI_API_KEY",
+      "ai_model": "gemini-2.0-flash-exp"
+    }'
+done
 
 # Test 3: Validation errors
 curl -X POST https://data-tagger.vercel.app/api/tag \

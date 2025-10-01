@@ -3,14 +3,14 @@
  * 
  * Usage:
  * 1. Set environment variables:
- *    - DATA_TAGGER_API_SECRET
- *    - OPENAI_API_KEY (or GOOGLE_API_KEY or OPENROUTER_API_KEY)
+ *    - GEMINI_API_KEY (get free key at https://aistudio.google.com/app/apikey)
  * 2. Run: node examples/test-api.js
  */
 
-const API_URL = 'http://localhost:3000/api/tag' // Change to your deployed URL
-const API_SECRET = process.env.DATA_TAGGER_API_SECRET || 'your-secret-key'
-const AI_API_KEY = process.env.OPENAI_API_KEY || 'sk-...'
+const API_URL = 'https://data-tagger.vercel.app/api/tag'
+const AI_API_KEY = process.env.GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY'
+
+// Get your free Gemini API key at: https://aistudio.google.com/app/apikey
 
 // Sample CSV data
 const sampleCSV = `Response ID,Date,Customer Comment,Rating
@@ -56,14 +56,15 @@ async function testAPI() {
     csv_data: sampleCSV,
     column: 'Customer Comment',
     tags: tags,
-    ai_provider: 'openai',
+    ai_provider: 'google',
     ai_api_key: AI_API_KEY,
-    ai_model: 'gpt-4o-mini'
+    ai_model: 'gemini-2.0-flash-exp'
   }
 
   console.log('📤 Sending request to:', API_URL)
   console.log('📋 Processing', sampleCSV.split('\n').length - 1, 'rows')
   console.log('🏷️  Using', tags.length, 'tags:', tags.map(t => t.name).join(', '))
+  console.log('🤖 Using Google Gemini (free tier)')
   console.log('\n⏳ Processing...\n')
 
   try {

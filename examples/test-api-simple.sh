@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Simple test script for Data Tagger API
-# Replace YOUR_OPENAI_KEY with your actual API key
+# Get your free Gemini API key at: https://aistudio.google.com/app/apikey
+# Replace YOUR_GEMINI_API_KEY with your actual API key
 
 curl -X POST https://data-tagger.vercel.app/api/tag \
   -H "Content-Type: application/json" \
@@ -18,9 +19,9 @@ curl -X POST https://data-tagger.vercel.app/api/tag \
         "description": "Customer expressed dissatisfaction or negative sentiment"
       }
     ],
-    "ai_provider": "openai",
-    "ai_api_key": "YOUR_OPENAI_KEY",
-    "ai_model": "gpt-4o-mini"
+    "ai_provider": "google",
+    "ai_api_key": "YOUR_GEMINI_API_KEY",
+    "ai_model": "gemini-2.0-flash-exp"
   }'
 
 echo ""

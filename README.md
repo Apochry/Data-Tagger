@@ -86,17 +86,18 @@ The built files will be in the `dist/` directory, ready for deployment.
 Perfect for Zapier, Make, n8n, or custom integrations:
 
 ```bash
-curl -X POST https://your-app.vercel.app/api/tag \
+curl -X POST https://data-tagger.vercel.app/api/tag \
   -H "Content-Type: application/json" \
-  -H "X-API-Secret: your-secret" \
   -d '{
-    "csv_data": "ID,Comment\n1,Great!",
+    "csv_data": "ID,Comment\n1,Great service!",
     "column": "Comment",
     "tags": [{"name": "Positive", "description": "Happy feedback"}],
-    "ai_provider": "openai",
-    "ai_api_key": "sk-...",
-    "ai_model": "gpt-4o-mini"
+    "ai_provider": "google",
+    "ai_api_key": "YOUR_GEMINI_KEY",
+    "ai_model": "gemini-2.0-flash-exp"
   }'
+  
+# Get free Gemini key: https://aistudio.google.com/app/apikey
 ```
 
 🚀 **Quick Start (5 min)**: See [QUICK_START_ZAPIER.md](QUICK_START_ZAPIER.md)  

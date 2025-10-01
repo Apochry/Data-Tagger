@@ -59,9 +59,9 @@ Choose one provider:
   csv_data: [Construct CSV from sheet rows - see below]
   column: "Comment"
   tags: [See tags format below]
-  ai_provider: "openai"
-  ai_api_key: "sk-..." [Store in Zapier Storage]
-  ai_model: "gpt-4o-mini"
+  ai_provider: "google"
+  ai_api_key: "YOUR_GEMINI_KEY" [Store in Zapier Storage]
+  ai_model: "gemini-2.0-flash-exp"
   ```
 - Headers:
   ```
@@ -91,9 +91,9 @@ output = {
       description: "Negative feedback or complaints"
     }
   ],
-  ai_provider: "openai",
-  ai_api_key: inputData.openaiKey,
-  ai_model: "gpt-4o-mini"
+  ai_provider: "google",
+  ai_api_key: inputData.geminiKey,
+  ai_model: "gemini-2.0-flash-exp"
 };
 ```
 
@@ -110,9 +110,9 @@ output = {
   csv_data: csvData,
   column: "Comment",
   tags: [...],
-  ai_provider: "openai",
-  ai_api_key: inputData.openaiKey,
-  ai_model: "gpt-4o-mini"
+  ai_provider: "google",
+  ai_api_key: inputData.geminiKey,
+  ai_model: "gemini-2.0-flash-exp"
 };
 ```
 

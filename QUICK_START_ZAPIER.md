@@ -61,9 +61,9 @@ https://data-tagger.vercel.app/api/tag
 | `csv_data` | `ID,Comment\n{{ID}},{{Comment}}` |
 | `column` | `Comment` |
 | `tags` | See format below |
-| `ai_provider` | `openai` |
+| `ai_provider` | `google` |
 | `ai_api_key` | `{{storage.my_ai_key}}` |
-| `ai_model` | `gpt-4o-mini` |
+| `ai_model` | `gemini-2.0-flash-exp` |
 
 **Tags format** (paste this in the `tags` field):
 ```json
@@ -120,11 +120,13 @@ Here's exactly what gets sent to the API:
       "description": "Customer expressed frustration"
     }
   ],
-  "ai_provider": "openai",
-  "ai_api_key": "sk-proj-...",
-  "ai_model": "gpt-4o-mini"
+  "ai_provider": "google",
+  "ai_api_key": "YOUR_GEMINI_KEY",
+  "ai_model": "gemini-2.0-flash-exp"
 }
 ```
+
+**Note**: Google Gemini has a free tier - get your key at https://aistudio.google.com/app/apikey
 
 ## What You Get Back
 

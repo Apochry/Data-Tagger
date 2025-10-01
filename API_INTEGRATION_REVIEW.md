@@ -23,9 +23,9 @@ The API and Zapier integration have been reviewed and are **ready for end users*
       "description": "Positive feedback"
     }
   ],
-  "ai_provider": "openai",
-  "ai_api_key": "sk-...",
-  "ai_model": "gpt-4o-mini"
+  "ai_provider": "google",
+  "ai_api_key": "YOUR_GEMINI_API_KEY",
+  "ai_model": "gemini-2.0-flash-exp"
 }
 ```
 
@@ -117,15 +117,16 @@ Before going live, test these scenarios:
 
 #### ✅ Test 1: Single Row Processing
 ```bash
+# Get free Gemini key at: https://aistudio.google.com/app/apikey
 curl -X POST https://data-tagger.vercel.app/api/tag \
   -H "Content-Type: application/json" \
   -d '{
     "csv_data": "ID,Comment\n1,Great service!",
     "column": "Comment",
     "tags": [{"name": "Positive", "description": "Positive feedback"}],
-    "ai_provider": "openai",
-    "ai_api_key": "YOUR_KEY",
-    "ai_model": "gpt-4o-mini"
+    "ai_provider": "google",
+    "ai_api_key": "YOUR_GEMINI_KEY",
+    "ai_model": "gemini-2.0-flash-exp"
   }'
 ```
 
@@ -142,9 +143,9 @@ curl -X POST https://data-tagger.vercel.app/api/tag \
       {"name": "Positive", "description": "Positive sentiment"},
       {"name": "Negative", "description": "Negative sentiment"}
     ],
-    "ai_provider": "openai",
-    "ai_api_key": "YOUR_KEY",
-    "ai_model": "gpt-4o-mini"
+    "ai_provider": "google",
+    "ai_api_key": "YOUR_GEMINI_KEY",
+    "ai_model": "gemini-2.0-flash-exp"
   }'
 ```
 
@@ -269,11 +270,14 @@ curl -X POST https://data-tagger.vercel.app/api/tag \
 - **100 rows**: ~1-3 minutes
 - **1,000 rows**: ~10-30 minutes
 
-### Cost Estimates (OpenAI gpt-4o-mini)
-- **Per row**: ~$0.00015
-- **100 rows**: ~$0.015 (less than 2 cents)
-- **1,000 rows**: ~$0.15
-- **10,000 rows**: ~$1.50
+### Cost Estimates (Google Gemini)
+- **Free Tier**: 15 requests per minute, 1500 per day
+- **Per row**: $0 (free tier)
+- **100 rows**: $0 (free!)
+- **1,000 rows**: $0 (free!)
+- **10,000 rows**: $0 (free!)
+
+**Note**: Gemini Flash has a generous free tier. For paid usage, it's even cheaper than OpenAI.
 
 ### Vercel Limits (Free Tier)
 - **Function timeout**: 10 seconds (may need upgrade for large datasets)

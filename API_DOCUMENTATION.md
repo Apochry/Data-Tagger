@@ -56,9 +56,9 @@ Content-Type: application/json
       "examples": ["Terrible", "Disappointed"]
     }
   ],
-  "ai_provider": "openai",
-  "ai_api_key": "sk-...",
-  "ai_model": "gpt-4o-mini"
+  "ai_provider": "google",
+  "ai_api_key": "YOUR_GEMINI_KEY",
+  "ai_model": "gemini-2.0-flash-exp"
 }
 ```
 
@@ -196,10 +196,12 @@ curl -X POST https://data-tagger.vercel.app/api/tag \
         "examples": ["Great", "Excellent"]
       }
     ],
-    "ai_provider": "openai",
-    "ai_api_key": "sk-...",
-    "ai_model": "gpt-4o-mini"
+    "ai_provider": "google",
+    "ai_api_key": "YOUR_GEMINI_KEY",
+    "ai_model": "gemini-2.0-flash-exp"
   }'
+  
+# Get free Gemini key at: https://aistudio.google.com/app/apikey
 ```
 
 ### JavaScript Example
@@ -216,9 +218,9 @@ const response = await fetch('https://data-tagger.vercel.app/api/tag', {
       name: "Positive",
       description: "Positive feedback"
     }],
-    ai_provider: "openai",
-    ai_api_key: "sk-...",
-    ai_model: "gpt-4o-mini"
+    ai_provider: "google",
+    ai_api_key: process.env.GEMINI_API_KEY,
+    ai_model: "gemini-2.0-flash-exp"
   })
 })
 
@@ -242,9 +244,9 @@ response = requests.post(
             'name': 'Positive',
             'description': 'Positive feedback'
         }],
-        'ai_provider': 'openai',
-        'ai_api_key': 'sk-...',
-        'ai_model': 'gpt-4o-mini'
+        'ai_provider': 'google',
+        'ai_api_key': os.environ['GEMINI_API_KEY'],
+        'ai_model': 'gemini-2.0-flash-exp'
     }
 )
 
@@ -263,15 +265,22 @@ API calls consume AI provider credits. Estimate costs:
 - Output tokens: ~10-50 tokens (tag names)
 - Total per row: ~150-250 tokens
 
-**Example with OpenAI GPT-4o-mini:**
-- Cost: ~$0.00015 per row (150 tokens @ $0.15/1M input + $0.60/1M output)
+**Recommended: Google Gemini (FREE):**
+- **Free tier**: 15 requests per minute, 1,500 per day
+- Cost: $0.00
+- 1,000 rows: **FREE** ✨
+- 10,000 rows: **FREE** ✨
+- [Get free key](https://aistudio.google.com/app/apikey)
+
+**Alternative: OpenAI GPT-4o-mini (Paid):**
+- Cost: ~$0.00015 per row
 - 1,000 rows: ~$0.15
 - 10,000 rows: ~$1.50
 
 **Tips to reduce costs:**
-- Use smaller/faster models (e.g., `gpt-4o-mini` vs `gpt-4o`)
+- **Start with Gemini** - generous free tier!
 - Keep tag descriptions concise
-- Use Google Gemini Flash (free tier available)
+- Use smaller/faster models
 - Batch similar responses together
 
 ---
