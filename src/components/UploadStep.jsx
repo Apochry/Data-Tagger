@@ -10,15 +10,6 @@ export default function UploadStep({ onComplete }) {
   const [isDragging, setIsDragging] = useState(false)
   const [showGuideModal, setShowGuideModal] = useState(false)
 
-  // Show guide modal on first visit
-  useEffect(() => {
-    const hasSeenGuide = localStorage.getItem('hasSeenSetupGuide')
-    if (!hasSeenGuide) {
-      setShowGuideModal(true)
-      localStorage.setItem('hasSeenSetupGuide', 'true')
-    }
-  }, [])
-
   const handleFile = (file) => {
     if (file && file.type === 'text/csv') {
       setFileName(file.name)
