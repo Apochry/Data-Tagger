@@ -20,12 +20,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/ai-tagger.git"
+    "url": "https://github.com/Apochry/Data-Tagger.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ai-tagger/issues"
+    "url": "https://github.com/Apochry/Data-Tagger/issues"
   },
-  "homepage": "https://github.com/yourusername/ai-tagger#readme",
+  "homepage": "https://github.com/Apochry/Data-Tagger#readme",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

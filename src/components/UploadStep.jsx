@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Papa from 'papaparse'
+import SetupGuideModal from './SetupGuideModal'
 
 export default function UploadStep({ onComplete }) {
   const [csvData, setCsvData] = useState(null)
@@ -7,6 +8,16 @@ export default function UploadStep({ onComplete }) {
   const [selectedColumn, setSelectedColumn] = useState('')
   const [fileName, setFileName] = useState('')
   const [isDragging, setIsDragging] = useState(false)
+  const [showGuideModal, setShowGuideModal] = useState(false)
+
+  // Show guide modal on first visit
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('hasSeenSetupGuide')
+    if (!hasSeenGuide) {
+      setShowGuideModal(true)
+      localStorage.setItem('hasSeenSetupGuide', 'true')
+    }
+  }, [])
 
   const handleFile = (file) => {
     if (file && file.type === 'text/csv') {
@@ -56,10 +67,50 @@ export default function UploadStep({ onComplete }) {
 
   return (
     <div className="p-12">
-      <h2 className="text-3xl font-bold text-gray-900 mb-3">Upload Your Data</h2>
-      <p className="text-gray-600 mb-8 font-light">
-        Begin by uploading a CSV file containing your survey responses
-      </p>
+      {/* Setup Guide Modal */}
+      <SetupGuideModal 
+        isOpen={showGuideModal} 
+        onClose={() => setShowGuideModal(false)} 
+      />
+
+      {/* Header with Guide Button */}
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900">Upload Your Data</h2>
+          <p className="text-gray-600 mt-2 font-light">
+            Begin by uploading a CSV file containing your survey responses
+          </p>
+        </div>
+        <button
+          onClick={() => setShowGuideModal(true)}
+          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-sm hover:border-gray-400 transition-colors"
+          title="View setup options"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Setup Options
+        </button>
+      </div>
+
+      {/* Info Banner */}
+      <div className="bg-blue-50 border border-blue-200 rounded-sm p-4 mb-8 flex items-start gap-3">
+        <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div className="flex-1">
+          <p className="text-sm text-gray-700 font-light">
+            <strong className="font-medium">New:</strong> Need to automate tagging? We now support{' '}
+            <button 
+              onClick={() => setShowGuideModal(true)}
+              className="text-blue-700 hover:text-blue-800 underline font-medium"
+            >
+              Zapier integration
+            </button>
+            {' '}for automatic processing.
+          </p>
+        </div>
+      </div>
 
       {/* File Upload Area */}
       {!csvData ? (

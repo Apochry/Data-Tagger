@@ -8,6 +8,7 @@ An elegant, client-side web application for automatically tagging survey respons
 
 ## ✨ Features
 
+### Web Interface
 - 🎨 **Minimalist Design**: Clean interface with intuitive multi-step workflow
 - 🔄 **Multi-Provider Support**: Choose from Google AI (Gemini), OpenAI (GPT), or OpenRouter (100+ models)
 - 🔍 **Dynamic Model Discovery**: Automatically fetches latest available models from each provider
@@ -18,6 +19,14 @@ An elegant, client-side web application for automatically tagging survey respons
 - 🔄 **Smart Navigation**: Click any completed step to go back and modify
 - ⚡ **Rate Limiting**: Automatic retry with exponential backoff
 - 📥 **Enhanced Output**: Download CSV with AI tags and binary indicator columns
+
+### API for Automation
+- 🔌 **REST API**: Serverless endpoint for automation tools
+- ⚡ **Zapier Compatible**: Integrate with 5,000+ apps
+- 🔒 **Secure Pass-Through**: AI keys never stored on server
+- 📊 **Batch Processing**: Handle up to 10,000 rows per request
+- 🚦 **Rate Limiting**: Built-in protection against abuse
+- 📝 **Full Documentation**: Complete API docs and examples
 
 ## 🚀 Quick Start
 
@@ -54,6 +63,8 @@ The built files will be in the `dist/` directory, ready for deployment.
 
 ## 📖 How to Use
 
+### Web Interface
+
 1. **Upload CSV**: Drag and drop your survey response CSV file
 2. **Select Column**: Choose the column containing comments to tag
 3. **Define Tags**: Create your tagging structure with:
@@ -69,6 +80,29 @@ The built files will be in the `dist/` directory, ready for deployment.
    - Original data intact
    - `AI_Tags` column with comma-separated tags
    - Binary columns for each tag (0/1)
+
+### API / Automation
+
+Perfect for Zapier, Make, n8n, or custom integrations:
+
+```bash
+curl -X POST https://your-app.vercel.app/api/tag \
+  -H "Content-Type: application/json" \
+  -H "X-API-Secret: your-secret" \
+  -d '{
+    "csv_data": "ID,Comment\n1,Great!",
+    "column": "Comment",
+    "tags": [{"name": "Positive", "description": "Happy feedback"}],
+    "ai_provider": "openai",
+    "ai_api_key": "sk-...",
+    "ai_model": "gpt-4o-mini"
+  }'
+```
+
+🚀 **Quick Start (5 min)**: See [QUICK_START_ZAPIER.md](QUICK_START_ZAPIER.md)  
+📚 **Full API Documentation**: See [API_DOCUMENTATION.md](API_DOCUMENTATION.md)  
+🔌 **Zapier Guide**: See [ZAPIER_GUIDE.md](ZAPIER_GUIDE.md)  
+💡 **Examples**: See [examples/](examples/) folder
 
 ## 🏗️ Architecture
 
@@ -155,14 +189,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🗺️ Roadmap
 
+- [x] REST API for automation
+- [x] Zapier integration support
 - [ ] Add Anthropic Claude support
-- [ ] Batch processing with parallel requests
+- [ ] Batch processing with parallel requests (API)
 - [ ] Export to Excel (.xlsx) format
 - [ ] Tag confidence scores display
 - [ ] Processing cost estimation
 - [ ] Resume interrupted processing
 - [ ] Tag template library
 - [ ] Multi-language support
+- [ ] Official Zapier App listing
+- [ ] Make.com integration templates
 
 ## 💡 Why Use This Tool?
 
