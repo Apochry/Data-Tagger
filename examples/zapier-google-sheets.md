@@ -97,9 +97,42 @@ output = {
   - Content-Type: `application/json`
 - **Wrap Request In Array**: No
 
+**Important formatting tips**
+- `csv_data` must include a header row followed by your data row, separated by a newline. Example:
+  ```
+  Customer Comment
+  Great service! Very helpful.
+  ```
+- `tags` must be a valid JSON array (Zapier will show square brackets). Example:
+  ```
+  [
+    {"name": "Positive", "description": "Positive sentiment"},
+    {"name": "Negative", "description": "Negative sentiment"}
+  ]
+  ```
+- If your source value doesn’t already include a newline, add a Formatter → Text → Append step to build `Header\nValue` before the webhook call.
+
 **Note**: No authentication headers needed - this is a public API!
 
-#### Action 3: Code by Zapier (Parse Response)
+#### Action 3: Formatter by Zapier (Import CSV)
+- **App**: Formatter by Zapier
+- **Event**: Utilities → Import CSV
+- **CSV Input**: `Csv Output` (from Webhooks step)
+
+This converts the API's CSV string into line-item fields (e.g., `Customer Comment`, `AI_Tags`, `Positive`, `Negative`) that map cleanly to Google Sheets.
+
+#### Action 4: Google Sheets (Write Results)
+- **App**: Google Sheets
+- **Event**: Create Spreadsheet Row(s)
+- **Account**: Your Google account
+- **Drive**: Select drive
+- **Spreadsheet**: "Survey Responses"
+- **Worksheet**: "Tagged Responses"
+- Map each column to the corresponding line-item output from the Formatter step.
+
+> **Prefer code?** If you’d rather parse the CSV manually, swap the Formatter step for the JavaScript snippet below.
+
+#### Optional: Code by Zapier (Manual CSV Parse)
 - **App**: Code by Zapier
 - **Event**: Run JavaScript
 - **Input Data**:
@@ -133,21 +166,6 @@ output = {
   negative: row['Negative']
 };
 ```
-
-#### Action 4: Google Sheets (Write Results)
-- **App**: Google Sheets
-- **Event**: Create Spreadsheet Row
-- **Account**: Your Google account
-- **Drive**: Select drive
-- **Spreadsheet**: "Survey Responses"
-- **Worksheet**: "Tagged Responses"
-- **Response ID**: (from Code step)
-- **Date**: (from Code step)
-- **Customer Comment**: (from Code step)
-- **Rating**: (from Code step)
-- **AI_Tags**: (from Code step)
-- **Positive**: (from Code step)
-- **Negative**: (from Code step)
 
 ### 3. Store Your AI API Key in Zapier Storage
 
@@ -249,6 +267,11 @@ output = {
 ---
 
 ## Troubleshooting
+
+### CSV contains no data
+- Ensure `csv_data` includes a header row and at least one data row separated by a newline (two lines in Zapier’s editor).
+- If the field appears on one line, add a Formatter → Text → Append step to create `Header\nValue` before sending to the webhook.
+- Confirm the source value doesn’t contain stray carriage returns that break the CSV structure.
 
 ### Tags Not Matching Expectations
 - Make tag descriptions more specific
