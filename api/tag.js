@@ -364,9 +364,37 @@ export default async function handler(req, res) {
       body = {}
     }
 
+    if (typeof body.tags === 'string') {
+      try {
+        body.tags = JSON.parse(body.tags)
+      } catch (parseError) {
+        console.error('Validation Error: Unable to parse "tags" string as JSON array.', parseError.message)
+        return res.status(400).json({
+          error: 'Validation failed',
+          message: 'The "tags" field must be a JSON array.',
+        })
+      }
+    }
+
+    if (!Array.isArray(body.tags)) {
+      console.error('Validation Error: The "tags" field is missing or not an array. Received:', body.tags)
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'The "tags" field must be a non-empty array.',
+      })
+    }
+
     const csvString = typeof body.csv_data === 'string' ? body.csv_data : ''
     const csvPreview = csvString ? csvString.slice(0, 500) : undefined
     const csvLines = csvString ? csvString.split('\n').length : undefined
+
+    const sanitizedBodyForLog = {
+      ...body,
+      ai_api_key: maskApiKey(body.ai_api_key),
+      csv_data: csvPreview,
+    }
+
+    console.log('Full Parsed Body:', sanitizedBodyForLog)
 
     console.log('Incoming /api/tag request', {
       received_at: new Date().toISOString(),
@@ -374,12 +402,14 @@ export default async function handler(req, res) {
       method: req.method,
       column: body.column,
       csv_rows: csvLines,
-      tags: Array.isArray(body.tags) ? body.tags : undefined,
+      tags_count: body.tags.length,
       ai_provider: body.ai_provider,
       ai_model: body.ai_model,
       ai_api_key_masked: maskApiKey(body.ai_api_key),
       csv_data_preview: csvPreview,
     })
+
+    console.log(`Successfully validated ${body.tags.length} tags.`)
 
     if (!checkRateLimit(identifier)) {
       return res.status(429).json({ 
