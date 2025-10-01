@@ -20,6 +20,18 @@ import Papa from 'papaparse'
 // Rate limiting storage (in-memory for simplicity, use Redis for production)
 const requestCounts = new Map()
 
+function maskApiKey(key) {
+  if (!key || typeof key !== 'string') {
+    return undefined
+  }
+
+  if (key.length <= 8) {
+    return '***redacted***'
+  }
+
+  return `${key.slice(0, 4)}...${key.slice(-4)}`
+}
+
 // Rate limiter
 function checkRateLimit(identifier) {
   const now = Date.now()
@@ -333,6 +345,42 @@ export default async function handler(req, res) {
   try {
     // 1. Rate limiting (primary defense for public API)
     const identifier = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+
+    let body = req.body
+
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body)
+      } catch (parseError) {
+        console.error('Invalid JSON payload:', parseError.message)
+        return res.status(400).json({
+          error: 'Validation failed',
+          message: 'Request body must be valid JSON.',
+        })
+      }
+    }
+
+    if (!body || typeof body !== 'object') {
+      body = {}
+    }
+
+    const csvString = typeof body.csv_data === 'string' ? body.csv_data : ''
+    const csvPreview = csvString ? csvString.slice(0, 500) : undefined
+    const csvLines = csvString ? csvString.split('\n').length : undefined
+
+    console.log('Incoming /api/tag request', {
+      received_at: new Date().toISOString(),
+      ip: identifier,
+      method: req.method,
+      column: body.column,
+      csv_rows: csvLines,
+      tags: Array.isArray(body.tags) ? body.tags : undefined,
+      ai_provider: body.ai_provider,
+      ai_model: body.ai_model,
+      ai_api_key_masked: maskApiKey(body.ai_api_key),
+      csv_data_preview: csvPreview,
+    })
+
     if (!checkRateLimit(identifier)) {
       return res.status(429).json({ 
         error: 'Too many requests',
@@ -341,7 +389,7 @@ export default async function handler(req, res) {
     }
 
     // 3. Validate inputs
-    const validationErrors = validateInputs(req.body)
+    const validationErrors = validateInputs(body)
     if (validationErrors.length > 0) {
       return res.status(400).json({ 
         error: 'Validation failed',
@@ -349,7 +397,7 @@ export default async function handler(req, res) {
       })
     }
 
-    const { csv_data, column, tags, ai_provider, ai_api_key, ai_model } = req.body
+    const { csv_data, column, tags, ai_provider, ai_api_key, ai_model } = body
 
     // 3. Process data
     console.log(`Processing ${csv_data.split('\n').length} rows with ${tags.length} tags using ${ai_provider}/${ai_model}`)
