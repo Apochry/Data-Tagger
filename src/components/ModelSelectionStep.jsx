@@ -447,7 +447,7 @@ YOUR RESPONSE (comma-separated tag names only):`
                 </a>
               </p>
               <p className="text-xs text-gray-400 italic">
-                🔒 Your API key will be kept private and is never stored or saved outside of your machine
+                Your API key will be kept private and is never stored or saved outside of your machine
               </p>
             </div>
           </div>
