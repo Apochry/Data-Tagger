@@ -1,14 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Papa from 'papaparse'
 import SetupGuideModal from './SetupGuideModal'
 
-export default function UploadStep({ onComplete }) {
-  const [csvData, setCsvData] = useState(null)
+export default function UploadStep({ onComplete, initialCsvData, initialSelectedColumn, initialFileName, onReset }) {
+  const [csvData, setCsvData] = useState(initialCsvData || null)
   const [columns, setColumns] = useState([])
-  const [selectedColumn, setSelectedColumn] = useState('')
-  const [fileName, setFileName] = useState('')
+  const [selectedColumn, setSelectedColumn] = useState(initialSelectedColumn || '')
+  const [fileName, setFileName] = useState(initialFileName || '')
   const [isDragging, setIsDragging] = useState(false)
   const [showGuideModal, setShowGuideModal] = useState(false)
+
+  useEffect(() => {
+    if (initialCsvData) {
+      const detectedColumns = initialCsvData.length > 0 ? Object.keys(initialCsvData[0]) : []
+      setColumns(detectedColumns)
+    }
+  }, [initialCsvData])
 
   const handleFile = (file) => {
     if (file && file.type === 'text/csv') {
@@ -19,6 +26,7 @@ export default function UploadStep({ onComplete }) {
         complete: (results) => {
           setCsvData(results.data)
           setColumns(results.meta.fields)
+          setSelectedColumn('')
         },
         error: (error) => {
           alert('Error parsing CSV: ' + error.message)
@@ -52,7 +60,21 @@ export default function UploadStep({ onComplete }) {
 
   const handleContinue = () => {
     if (selectedColumn && csvData) {
-      onComplete(csvData, selectedColumn)
+      onComplete(csvData, selectedColumn, fileName)
+    }
+  }
+
+  const hasUpload = useMemo(() => {
+    return Boolean(csvData && csvData.length > 0)
+  }, [csvData])
+
+  const handleReset = () => {
+    setCsvData(null)
+    setColumns([])
+    setSelectedColumn('')
+    setFileName('')
+    if (onReset) {
+      onReset()
     }
   }
 
@@ -73,7 +95,7 @@ export default function UploadStep({ onComplete }) {
       </div>
 
       {/* File Upload Area */}
-      {!csvData ? (
+      {!hasUpload ? (
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -132,6 +154,12 @@ export default function UploadStep({ onComplete }) {
               <p className="font-medium text-gray-900">{fileName}</p>
               <p className="text-sm text-gray-500">{csvData.length} rows loaded</p>
             </div>
+            <button
+              onClick={handleReset}
+              className="text-sm text-red-600 hover:text-red-700 underline"
+            >
+              Remove file
+            </button>
           </div>
 
           {/* Column Selection */}

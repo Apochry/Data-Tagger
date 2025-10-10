@@ -23,6 +23,10 @@ function App() {
     return saved || null
   })
   
+  const [csvFileName, setCsvFileName] = useState(() => {
+    return localStorage.getItem('aiTagger_csvFileName') || ''
+  })
+  
   const [tags, setTags] = useState(() => {
     const saved = localStorage.getItem('aiTagger_tags')
     const parsed = saved ? JSON.parse(saved) : []
@@ -51,14 +55,26 @@ function App() {
   useEffect(() => {
     if (csvData) {
       localStorage.setItem('aiTagger_csvData', JSON.stringify(csvData))
+    } else {
+      localStorage.removeItem('aiTagger_csvData')
     }
   }, [csvData])
 
   useEffect(() => {
     if (selectedColumn) {
       localStorage.setItem('aiTagger_selectedColumn', selectedColumn)
+    } else {
+      localStorage.removeItem('aiTagger_selectedColumn')
     }
   }, [selectedColumn])
+
+  useEffect(() => {
+    if (csvFileName) {
+      localStorage.setItem('aiTagger_csvFileName', csvFileName)
+    } else {
+      localStorage.removeItem('aiTagger_csvFileName')
+    }
+  }, [csvFileName])
 
   useEffect(() => {
     if (tags.length > 0) {
@@ -67,9 +83,10 @@ function App() {
     }
   }, [tags])
 
-  const handleUploadComplete = (data, column) => {
+  const handleUploadComplete = (data, column, fileLabel) => {
     setCsvData(data)
     setSelectedColumn(column)
+    setCsvFileName(fileLabel || '')
     setCurrentStep(1)
   }
 
@@ -100,6 +117,15 @@ function App() {
     // Clear tags from localStorage and state
     localStorage.removeItem('aiTagger_tags')
     setTags([])
+  }
+
+  const clearUploadData = () => {
+    setCsvData(null)
+    setSelectedColumn('')
+    setCsvFileName('')
+    localStorage.removeItem('aiTagger_csvData')
+    localStorage.removeItem('aiTagger_selectedColumn')
+    localStorage.removeItem('aiTagger_csvFileName')
   }
 
   return (
@@ -157,7 +183,13 @@ function App() {
       <main className="max-w-6xl mx-auto px-8 pb-24">
         <div className="bg-white border border-gray-200 rounded-sm shadow-sm">
           {currentStep === 0 && (
-            <UploadStep onComplete={handleUploadComplete} />
+            <UploadStep 
+              onComplete={handleUploadComplete}
+              initialCsvData={csvData}
+              initialSelectedColumn={selectedColumn}
+              initialFileName={csvFileName}
+              onReset={clearUploadData}
+            />
           )}
           {currentStep === 1 && (
             <TagDefinitionStep 

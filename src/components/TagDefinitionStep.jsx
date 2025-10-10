@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import TagImportModal from './TagImportModal'
 
 export default function TagDefinitionStep({ onComplete, initialTags, onClearAll }) {
   const [tags, setTags] = useState(() => {
@@ -17,6 +18,7 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
       },
     ]
   })
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
 
   // Autosave tags to localStorage whenever they change
   useEffect(() => {
@@ -114,16 +116,31 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
     }
   }
 
+  const handleImportedTags = (importedTags) => {
+    if (!importedTags || importedTags.length === 0) {
+      return
+    }
+
+    setTags(importedTags)
+    setIsImportModalOpen(false)
+  }
+
   return (
     <div className="p-12">
-      <div className="flex items-start justify-between mb-3">
-        <div>
+      <div className="flex items-start justify-between gap-4 mb-3">
+        <div className="flex-1">
           <h2 className="text-3xl font-bold text-gray-900">Define Your Tags</h2>
           <p className="text-gray-600 mt-2 font-light">
             Create the classification structure for your survey responses
           </p>
         </div>
-        {initialTags && initialTags.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="px-4 py-2 text-sm border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors rounded-sm"
+          >
+            Import Tags from CSV
+          </button>
           <button
             onClick={handleDeleteAll}
             className="px-4 py-2 text-sm text-red-600 hover:text-red-700 border border-red-300 rounded-sm hover:border-red-400 transition-colors"
@@ -131,7 +148,7 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
           >
             Delete All
           </button>
-        )}
+        </div>
       </div>
 
       <div className="space-y-6 mb-8 mt-8">
@@ -250,6 +267,12 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
           Continue to Model Selection
         </button>
       </div>
+
+      <TagImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImport={handleImportedTags}
+      />
     </div>
   )
 }

@@ -111,9 +111,6 @@ export default function CompletionStep({ processedData, tags }) {
           </svg>
           Download Tagged CSV
         </button>
-        <p className="text-center text-sm text-gray-500 mt-4">
-          CSV includes original columns, AI_Tags column, and binary columns for each tag
-        </p>
       </div>
     </div>
   )
