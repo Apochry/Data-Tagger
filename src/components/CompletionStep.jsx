@@ -26,9 +26,11 @@ export default function CompletionStep({ processedData, tags }) {
     return {
       name: tag.name,
       count,
-      percentage: ((count / totalRows) * 100).toFixed(1),
+      percentage: totalRows > 0 ? (count / totalRows) * 100 : 0,
     }
   })
+
+  const formatPercentage = (value) => `${value.toFixed(1)}%`
 
   return (
     <div className="p-12">
@@ -75,15 +77,23 @@ export default function CompletionStep({ processedData, tags }) {
         {/* Tag Breakdown */}
         <div className="border border-gray-200 rounded-sm divide-y divide-gray-200">
           {tagStats.map((stat) => (
-            <div key={stat.name} className="p-4 flex items-center justify-between">
-              <span className="font-medium text-gray-900">{stat.name}</span>
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
-                  {stat.count} responses
-                </span>
-                <span className="text-sm font-medium text-gray-900 w-12 text-right">
-                  {stat.percentage}%
-                </span>
+            <div key={stat.name} className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-medium text-gray-900">{stat.name}</span>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-gray-600">
+                    {stat.count} responses
+                  </span>
+                  <span className="text-sm font-medium text-gray-900 w-12 text-right">
+                    {formatPercentage(stat.percentage)}
+                  </span>
+                </div>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gray-900 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.max(0, Math.min(100, stat.percentage))}%` }}
+                ></div>
               </div>
             </div>
           ))}
