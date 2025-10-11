@@ -78,6 +78,27 @@ export default function UploadStep({ onComplete, initialCsvData, initialSelected
     }
   }
 
+  const getColumnPreview = (column) => {
+    if (!csvData || csvData.length === 0) {
+      return []
+    }
+
+    const values = csvData
+      .map((row) => {
+        const value = row?.[column]
+        if (value === undefined || value === null) {
+          return ''
+        }
+        if (typeof value === 'string') {
+          return value.trim()
+        }
+        return String(value)
+      })
+      .filter((value) => value !== '')
+
+    return values.slice(0, 5)
+  }
+
   return (
     <div className="p-12">
       {/* Setup Guide Modal */}
@@ -170,20 +191,55 @@ export default function UploadStep({ onComplete, initialCsvData, initialSelected
             <p className="text-gray-600 text-sm mb-4 font-light">
               Choose the column containing the comments you'd like to tag
             </p>
-            <div className="grid grid-cols-2 gap-3">
-              {columns.map((column) => (
-                <button
-                  key={column}
-                  onClick={() => setSelectedColumn(column)}
-                  className={`p-4 text-left border rounded-sm transition-all ${
-                    selectedColumn === column
-                      ? 'border-gray-900 bg-gray-50 ring-1 ring-gray-900'
-                      : 'border-gray-200 hover:border-gray-400'
-                  }`}
-                >
-                  <p className="font-medium text-gray-900">{column}</p>
-                </button>
-              ))}
+            <div className="flex flex-wrap items-start gap-3">
+              {columns.map((column) => {
+                const isSelected = selectedColumn === column
+                const previewItems = isSelected ? getColumnPreview(column) : []
+
+                return (
+                  <button
+                    key={column}
+                    type="button"
+                    onClick={() => setSelectedColumn(column)}
+                    className={`relative flex w-full flex-col items-start gap-3 overflow-visible rounded-sm border p-4 text-left transition-all md:basis-[calc(50%-0.75rem)] md:flex-none ${
+                      isSelected
+                        ? 'border-gray-900 bg-gray-50 ring-1 ring-gray-900'
+                        : 'border-gray-200 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="flex w-full items-start justify-between gap-3">
+                      <p className="font-medium text-gray-900 flex-1" style={{ wordBreak: 'break-word' }}>
+                        {column}
+                      </p>
+                      {isSelected && (
+                        <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                          preview
+                        </span>
+                      )}
+                    </div>
+                    {isSelected && (
+                      <div className="w-full">
+                        {previewItems.length > 0 ? (
+                          <ul className="space-y-2 text-sm text-gray-700">
+                            {previewItems.map((item, index) => (
+                              <li
+                                key={index}
+                                className="rounded-sm border border-gray-200 bg-white p-2 shadow-sm"
+                              >
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-xs text-gray-500">
+                            No sample responses detected in this column.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
