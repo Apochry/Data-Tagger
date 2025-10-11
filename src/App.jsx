@@ -5,6 +5,7 @@ import TagDefinitionStep from './components/TagDefinitionStep'
 import ModelSelectionStep from './components/ModelSelectionStep'
 import ProcessingStep from './components/ProcessingStep'
 import CompletionStep from './components/CompletionStep'
+import FloatingActions from './components/FloatingActions'
 
 function App() {
   // Load initial state from localStorage
@@ -129,7 +130,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="relative min-h-screen bg-gradient-to-b from-white to-gray-50">
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
         <div className="max-w-6xl mx-auto px-8 py-8 flex items-start justify-between">
@@ -241,6 +242,8 @@ function App() {
           </p>
         </div>
       </footer>
+
+      <FloatingActions />
     </div>
   )
 }
