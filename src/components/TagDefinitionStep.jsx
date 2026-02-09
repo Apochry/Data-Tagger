@@ -65,6 +65,12 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
     setTags(newTags)
   }
 
+  const autoResizeTextarea = (element) => {
+    if (!element) return
+    element.style.height = 'auto'
+    element.style.height = `${element.scrollHeight}px`
+  }
+
   const addExample = (tagIndex) => {
     const newTags = [...tags]
     newTags[tagIndex].examples.push('')
@@ -79,10 +85,8 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
 
   const deleteExample = (tagIndex, exampleIndex) => {
     const newTags = [...tags]
-    if (newTags[tagIndex].examples.length > 1) {
-      newTags[tagIndex].examples.splice(exampleIndex, 1)
-      setTags(newTags)
-    }
+    newTags[tagIndex].examples.splice(exampleIndex, 1)
+    setTags(newTags)
   }
 
   const handleContinue = () => {
@@ -151,17 +155,16 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
         </div>
       </div>
 
-      <div className="space-y-6 mb-8 mt-8">
+      <div className="space-y-4 mb-8 mt-8">
         {tags.map((tag, tagIndex) => (
           <div
             key={tag.id}
-            className="border border-gray-200 rounded-sm p-6 bg-white"
+            className="border border-gray-200 border-l-2 border-l-gray-400 rounded-sm p-4 bg-white"
           >
-            {/* Tag Header */}
-            <div className="flex items-start justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Tag {tagIndex + 1}
-              </h3>
+            <div className="flex items-start justify-between mb-2">
+              <div className="text-lg font-semibold text-gray-900">
+                {tagIndex + 1}
+              </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => duplicateTag(tagIndex)}
@@ -182,39 +185,45 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
               </div>
             </div>
 
-            {/* Tag Name */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Tag Name
-              </label>
-              <input
-                type="text"
-                value={tag.name}
-                onChange={(e) => updateTag(tagIndex, 'name', e.target.value)}
-                placeholder="e.g., Positive Feedback"
-                className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
-              />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 items-start">
+              {/* Tag Name */}
+              <div className="md:col-span-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
+                  Tag Name
+                </label>
+                <textarea
+                  value={tag.name}
+                  onChange={(e) => updateTag(tagIndex, 'name', e.target.value)}
+                  onInput={(e) => autoResizeTextarea(e.target)}
+                  ref={autoResizeTextarea}
+                  placeholder="e.g., Positive Feedback"
+                  rows={1}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 resize-none overflow-hidden leading-tight"
+                />
+              </div>
 
-            {/* Tag Description */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Description
-              </label>
-              <textarea
-                value={tag.description}
-                onChange={(e) =>
-                  updateTag(tagIndex, 'description', e.target.value)
-                }
-                placeholder="Describe when this tag should be applied..."
-                rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 resize-none"
-              />
+              {/* Tag Description */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={tag.description}
+                  onChange={(e) =>
+                    updateTag(tagIndex, 'description', e.target.value)
+                  }
+                  onInput={(e) => autoResizeTextarea(e.target)}
+                  ref={autoResizeTextarea}
+                  placeholder="Describe when this tag should be applied..."
+                  rows={1}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 resize-none overflow-hidden leading-tight"
+                />
+              </div>
             </div>
 
             {/* Examples */}
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-1">
                 Examples (Optional)
               </label>
               {tag.examples.map((example, exampleIndex) => (
@@ -226,17 +235,15 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
                       updateExample(tagIndex, exampleIndex, e.target.value)
                     }
                     placeholder={`Example ${exampleIndex + 1}`}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
                   />
-                  {tag.examples.length > 1 && (
-                    <button
-                      onClick={() => deleteExample(tagIndex, exampleIndex)}
-                      className="px-3 text-gray-600 hover:text-red-600"
-                      title="Remove example"
-                    >
-                      ×
-                    </button>
-                  )}
+                  <button
+                    onClick={() => deleteExample(tagIndex, exampleIndex)}
+                    className="px-3 text-gray-600 hover:text-red-600"
+                    title="Remove example"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
               <button
