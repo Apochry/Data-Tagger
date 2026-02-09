@@ -1,24 +1,33 @@
 import { useState, useEffect } from 'react'
 import TagImportModal from './TagImportModal'
+import TagReorderModal from './TagReorderModal'
 
 export default function TagDefinitionStep({ onComplete, initialTags, onClearAll }) {
+  const normalizeTag = (tag) => ({
+    ...tag,
+    examples: Array.isArray(tag.examples) ? tag.examples : [],
+  })
+
+  const createEmptyTag = () => ({
+    id: Date.now(),
+    name: '',
+    description: '',
+    examples: [],
+  })
+
   const [tags, setTags] = useState(() => {
     // Use initialTags if provided and not empty, otherwise use default empty tag
     if (initialTags && initialTags.length > 0) {
       console.log('📋 Loading saved tags from localStorage:', initialTags.length, 'tags')
-      return initialTags
+      return initialTags.map(normalizeTag)
     }
     console.log('📋 Starting with empty tag template')
-    return [
-      {
-        id: Date.now(),
-        name: '',
-        description: '',
-        examples: [''],
-      },
-    ]
+    return [createEmptyTag()]
   })
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+  const [isReorderModalOpen, setIsReorderModalOpen] = useState(false)
+  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false)
+  const [isClearingTags, setIsClearingTags] = useState(false)
 
   // Autosave tags to localStorage whenever they change
   useEffect(() => {
@@ -33,12 +42,7 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
   const addTag = () => {
     setTags([
       ...tags,
-      {
-        id: Date.now(),
-        name: '',
-        description: '',
-        examples: [''],
-      },
+      createEmptyTag(),
     ])
   }
 
@@ -105,19 +109,31 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
   }
 
   const handleDeleteAll = () => {
-    if (window.confirm('Are you sure you want to delete all saved tags? This cannot be undone.')) {
-      setTags([
-        {
-          id: Date.now(),
-          name: '',
-          description: '',
-          examples: [''],
-        },
-      ])
+    setShowDeleteAllConfirm(true)
+  }
+
+  const cancelDeleteAll = () => {
+    setShowDeleteAllConfirm(false)
+  }
+
+  const confirmDeleteAll = () => {
+    setShowDeleteAllConfirm(false)
+    setIsClearingTags(true)
+
+    const clearAllNow = () => {
+      setTags([createEmptyTag()])
       if (onClearAll) {
         onClearAll()
       }
+      setIsClearingTags(false)
     }
+
+    if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+      window.requestAnimationFrame(clearAllNow)
+      return
+    }
+
+    setTimeout(clearAllNow, 0)
   }
 
   const handleImportedTags = (importedTags) => {
@@ -125,8 +141,17 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
       return
     }
 
-    setTags(importedTags)
+    setTags(importedTags.map(normalizeTag))
     setIsImportModalOpen(false)
+  }
+
+  const handleReorderedTags = (reorderedTags) => {
+    if (!reorderedTags || reorderedTags.length === 0) {
+      return
+    }
+
+    setTags(reorderedTags.map(normalizeTag))
+    setIsReorderModalOpen(false)
   }
 
   return (
@@ -135,7 +160,7 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
         <div className="flex-1">
           <h2 className="text-3xl font-bold text-gray-900">Define Your Tags</h2>
           <p className="text-gray-600 mt-2 font-light">
-            Create the classification structure for your survey responses
+            Descriptions are used to determine what tags are applied
           </p>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -146,14 +171,43 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
             Import Tags from CSV
           </button>
           <button
+            onClick={() => setIsReorderModalOpen(true)}
+            className="px-4 py-2 text-sm border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors rounded-sm"
+          >
+            Reorder
+          </button>
+          <button
             onClick={handleDeleteAll}
-            className="px-4 py-2 text-sm text-red-600 hover:text-red-700 border border-red-300 rounded-sm hover:border-red-400 transition-colors"
+            disabled={isClearingTags}
+            className={`px-4 py-2 text-sm text-red-600 hover:text-red-700 border border-red-300 rounded-sm hover:border-red-400 transition-colors ${isClearingTags ? 'opacity-60 cursor-not-allowed' : ''}`}
             title="Delete all saved tags"
           >
-            Delete All
+            {isClearingTags ? 'Clearing...' : 'Delete All'}
           </button>
         </div>
       </div>
+
+      {showDeleteAllConfirm && (
+        <div className="mb-4 border border-red-200 bg-red-50 rounded-sm p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <p className="text-sm text-red-700">
+            Delete all saved tags? This cannot be undone.
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={confirmDeleteAll}
+              className="px-3 py-1.5 text-sm text-white bg-red-600 hover:bg-red-700 rounded-sm transition-colors"
+            >
+              Yes, Delete
+            </button>
+            <button
+              onClick={cancelDeleteAll}
+              className="px-3 py-1.5 text-sm border border-gray-300 text-gray-700 hover:bg-white rounded-sm transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-4 mb-8 mt-8">
         {tags.map((tag, tagIndex) => (
@@ -242,7 +296,7 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
                     className="px-3 text-gray-600 hover:text-red-600"
                     title="Remove example"
                   >
-                    ×
+                    &times;
                   </button>
                 </div>
               ))}
@@ -279,6 +333,12 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
         onImport={handleImportedTags}
+      />
+      <TagReorderModal
+        isOpen={isReorderModalOpen}
+        onClose={() => setIsReorderModalOpen(false)}
+        tags={tags}
+        onReorder={handleReorderedTags}
       />
     </div>
   )

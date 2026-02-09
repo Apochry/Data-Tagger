@@ -65,7 +65,7 @@ export default function TagImportModal({ isOpen, onClose, onImport }) {
       id: Date.now() + index,
       name: tag.name,
       description: tag.description || '',
-      examples: tag.examples.length > 0 ? tag.examples : [''],
+      examples: tag.examples.length > 0 ? tag.examples : [],
     }))
 
     return tags
@@ -150,18 +150,18 @@ export default function TagImportModal({ isOpen, onClose, onImport }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-sm w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="flex items-start justify-between px-8 py-6 border-b border-gray-200">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-sm w-full max-w-5xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="flex items-start justify-between gap-3 px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-200">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Import Tags from CSV</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Import Tags from CSV</h2>
             <p className="text-sm text-gray-600 mt-1 font-light">
               Upload a CSV with columns for Tag, Description, and Example to quickly define your tags.
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
             title="Close"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,14 +170,14 @@ export default function TagImportModal({ isOpen, onClose, onImport }) {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-8 py-6">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(260px,320px)]">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-4 sm:py-6">
+          <div className="grid gap-5 xl:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
             <div>
               <div
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
-                className={`border-2 border-dashed rounded-sm p-12 text-center transition-colors ${
+                className={`border-2 border-dashed rounded-sm p-6 sm:p-10 lg:p-12 text-center transition-colors ${
                   isDragging ? 'border-gray-900 bg-gray-50' : 'border-gray-300 hover:border-gray-400'
                 }`}
               >
@@ -218,7 +218,7 @@ export default function TagImportModal({ isOpen, onClose, onImport }) {
               </div>
             </div>
 
-            <div className="lg:border-l lg:border-gray-200 lg:pl-8">
+            <div className="border-t pt-5 xl:border-t-0 xl:pt-0 xl:border-l xl:border-gray-200 xl:pl-8">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-semibold text-gray-900">CSV Template</p>
                 <a
@@ -233,38 +233,40 @@ export default function TagImportModal({ isOpen, onClose, onImport }) {
                 Match these columns exactly in your CSV. You can add multiple rows for the same tag to provide additional examples.
               </p>
               <div className="border border-gray-200 rounded-sm overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200 text-left text-sm">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-2 font-semibold text-gray-700">Tag</th>
-                      <th className="px-4 py-2 font-semibold text-gray-700">Description</th>
-                      <th className="px-4 py-2 font-semibold text-gray-700">Example</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    <tr>
-                      <td className="px-4 py-3 text-gray-900">Positive Feedback</td>
-                      <td className="px-4 py-3 text-gray-600">Use when the response is positive.</td>
-                      <td className="px-4 py-3 text-gray-500 italic">"I love how easy this tool is to use."</td>
-                    </tr>
-                    <tr className="bg-gray-50">
-                      <td className="px-4 py-3 text-gray-900">Negative Feedback</td>
-                      <td className="px-4 py-3 text-gray-600">Use when the response expresses dissatisfaction.</td>
-                      <td className="px-4 py-3 text-gray-500 italic">"Support took too long to respond."</td>
-                    </tr>
-                    <tr>
-                      <td className="px-4 py-3 text-gray-900">Feature Request</td>
-                      <td className="px-4 py-3 text-gray-600">Use when someone suggests new functionality.</td>
-                      <td className="px-4 py-3 text-gray-500 italic">"Can you add dark mode?"</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div className="overflow-x-auto">
+                  <table className="min-w-[560px] w-full divide-y divide-gray-200 text-left text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 font-semibold text-gray-700">Tag</th>
+                        <th className="px-4 py-2 font-semibold text-gray-700">Description</th>
+                        <th className="px-4 py-2 font-semibold text-gray-700">Example</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      <tr>
+                        <td className="px-4 py-3 text-gray-900">Positive Feedback</td>
+                        <td className="px-4 py-3 text-gray-600">Use when the response is positive.</td>
+                        <td className="px-4 py-3 text-gray-500 italic">"I love how easy this tool is to use."</td>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <td className="px-4 py-3 text-gray-900">Negative Feedback</td>
+                        <td className="px-4 py-3 text-gray-600">Use when the response expresses dissatisfaction.</td>
+                        <td className="px-4 py-3 text-gray-500 italic">"Support took too long to respond."</td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 text-gray-900">Feature Request</td>
+                        <td className="px-4 py-3 text-gray-600">Use when someone suggests new functionality.</td>
+                        <td className="px-4 py-3 text-gray-500 italic">"Can you add dark mode?"</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="px-8 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+        <div className="px-4 sm:px-8 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
           <button
             onClick={handleClose}
             className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 underline"
