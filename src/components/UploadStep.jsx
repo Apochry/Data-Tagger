@@ -18,7 +18,9 @@ export default function UploadStep({ onComplete, initialCsvData, initialSelected
   }, [initialCsvData])
 
   const handleFile = (file) => {
-    if (file && file.type === 'text/csv') {
+    const isCsv = file && (file.type === 'text/csv' || file.name?.toLowerCase().endsWith('.csv'))
+
+    if (isCsv) {
       setFileName(file.name)
       Papa.parse(file, {
         header: true,

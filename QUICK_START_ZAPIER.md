@@ -49,7 +49,7 @@ When using the Zapier/API integration:
 
 **URL:**
 ```
-https://data-tagger.vercel.app/api/tag
+https://data-tagger.com/api/tag
 ```
 
 **Payload Type:** JSON
@@ -82,6 +82,7 @@ https://data-tagger.vercel.app/api/tag
 **Headers:**
 ```
 Content-Type: application/json
+x-api-token: {{storage.data_tagger_api_token}}
 ```
 
 4. Click **Test**

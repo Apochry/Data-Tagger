@@ -64,8 +64,8 @@ The API and Zapier integration have been reviewed and are **ready for end users*
 **Status**: ✅ Fixed
 
 #### 2. ❌ Wrong URLs (FIXED)
-**Problem**: Examples used `your-app.vercel.app` instead of actual deployed URL  
-**Fix**: Updated all URLs to `https://data-tagger.vercel.app/api/tag`  
+**Problem**: Examples used `data-tagger.com` instead of actual deployed URL  
+**Fix**: Updated all URLs to `https://data-tagger.com/api/tag`  
 **Status**: ✅ Fixed
 
 #### 3. ❌ Missing Quick Start (FIXED)
@@ -118,7 +118,7 @@ Before going live, test these scenarios:
 #### ✅ Test 1: Single Row Processing
 ```bash
 # Get free Gemini key at: https://aistudio.google.com/app/apikey
-curl -X POST https://data-tagger.vercel.app/api/tag \
+curl -X POST https://data-tagger.com/api/tag \
   -H "Content-Type: application/json" \
   -d '{
     "csv_data": "ID,Comment\n1,Great service!",
@@ -134,7 +134,7 @@ curl -X POST https://data-tagger.vercel.app/api/tag \
 
 #### ✅ Test 2: Multiple Rows
 ```bash
-curl -X POST https://data-tagger.vercel.app/api/tag \
+curl -X POST https://data-tagger.com/api/tag \
   -H "Content-Type: application/json" \
   -d '{
     "csv_data": "ID,Comment\n1,Great!\n2,Terrible.\n3,Okay.",
@@ -155,7 +155,7 @@ curl -X POST https://data-tagger.vercel.app/api/tag \
 ```bash
 # Run 11 requests quickly
 for i in {1..11}; do
-  curl -X POST https://data-tagger.vercel.app/api/tag \
+  curl -X POST https://data-tagger.com/api/tag \
     -H "Content-Type: application/json" \
     -d '{"csv_data": "ID,C\n1,test", "column": "C", ...}'
 done
@@ -166,7 +166,7 @@ done
 #### ✅ Test 4: Validation Errors
 ```bash
 # Missing required field
-curl -X POST https://data-tagger.vercel.app/api/tag \
+curl -X POST https://data-tagger.com/api/tag \
   -H "Content-Type: application/json" \
   -d '{
     "csv_data": "ID,Comment\n1,test",
@@ -230,7 +230,7 @@ curl -X POST https://data-tagger.vercel.app/api/tag \
 ## 🎯 User Flow Verification
 
 ### Flow 1: First-Time Zapier User
-1. ✅ User visits data-tagger.vercel.app
+1. ✅ User visits data-tagger.com
 2. ✅ Clicks "Setup Options" button
 3. ✅ Sees modal with Zapier instructions
 4. ✅ Clicks "Quick Start Guide (5 min)"

@@ -33,6 +33,13 @@ export default function TagImportModal({ isOpen, onClose, onImport }) {
     return { name, description, example }
   }
 
+  const createId = () => {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID()
+    }
+    return `tag_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+  }
+
   const buildTagsFromRows = (rows) => {
     const tagMap = new Map()
 
@@ -61,8 +68,8 @@ export default function TagImportModal({ isOpen, onClose, onImport }) {
       }
     })
 
-    const tags = Array.from(tagMap.values()).map((tag, index) => ({
-      id: Date.now() + index,
+    const tags = Array.from(tagMap.values()).map((tag) => ({
+      id: createId(),
       name: tag.name,
       description: tag.description || '',
       examples: tag.examples.length > 0 ? tag.examples : [],

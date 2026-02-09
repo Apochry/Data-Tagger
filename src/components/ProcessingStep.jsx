@@ -236,8 +236,8 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
               if (apiError.message.includes('429') || apiError.message.includes('quota') || apiError.message.includes('rate limit')) {
                 if (retryCount < maxRetries) {
                   const waitTime = Math.pow(2, retryCount) * 1000 // Exponential backoff: 1s, 2s, 4s
-                  console.warn(`⚠️ Rate limit hit, retrying in ${waitTime/1000}s... (attempt ${retryCount + 1}/${maxRetries})`)
-                  setStatus(`Rate limited. Retrying row ${i + 1} in ${waitTime/1000}s...`)
+                  console.warn(`[warn] Rate limit hit, retrying in ${waitTime / 1000}s... (attempt ${retryCount + 1}/${maxRetries})`)
+                  setStatus(`Rate limited. Retrying row ${i + 1} in ${waitTime / 1000}s...`)
                   await new Promise(resolve => setTimeout(resolve, waitTime))
                   retryCount++
                 } else {
@@ -276,7 +276,7 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
             const unmatched = parsedTags.filter(
               (pt) => !tagNames.find((tn) => tn.toLowerCase() === pt.toLowerCase())
             )
-            console.warn('⚠️ Unmatched tags from AI (not in tag list):', unmatched)
+            console.warn('[warn] Unmatched tags from AI (not in tag list):', unmatched)
           }
 
           // Create new row with tags
@@ -288,14 +288,14 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
             const isApplied = appliedTags.includes(tag.name)
             newRow[tag.name] = isApplied ? 1 : 0
             if (isApplied) {
-              console.log(`  ✓ Tag applied: "${tag.name}" (exact match)`)
+              console.log(`  [ok] Tag applied: "${tag.name}" (exact match)`)
             }
           })
 
           processedData.push(newRow)
           console.log('Row processed successfully')
         } catch (err) {
-          console.error('❌ ERROR processing row:', err)
+          console.error('[error] ERROR processing row:', err)
           console.error('Error details:', {
             message: err.message,
             name: err.name,
@@ -305,7 +305,7 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
           // Check if it's a critical error that should stop processing
           const isCriticalError = err.message.includes('quota') || err.message.includes('429')
           if (isCriticalError) {
-            console.error('💥 Critical error detected (quota/rate limit). Stopping processing.')
+            console.error('[critical] Critical error detected (quota/rate limit). Stopping processing.')
             setError(`API Error: ${err.message}. Processing stopped at row ${i + 1}.`)
             setStatus('Processing stopped due to API error')
             setIsProcessing(false)
@@ -350,7 +350,7 @@ YOUR RESPONSE (comma-separated tag names only):`.trim()
       setIsProcessing(false)
       onComplete(processedData)
     } catch (err) {
-      console.error('❌ FATAL PROCESSING ERROR:', err)
+      console.error('[error] FATAL PROCESSING ERROR:', err)
       console.error('Error details:', {
         message: err.message,
         name: err.name,

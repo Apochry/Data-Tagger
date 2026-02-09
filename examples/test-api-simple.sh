@@ -4,8 +4,9 @@
 # Get your free Gemini API key at: https://aistudio.google.com/app/apikey
 # Replace YOUR_GEMINI_API_KEY with your actual API key
 
-curl -X POST https://data-tagger.vercel.app/api/tag \
+curl -X POST https://data-tagger.com/api/tag \
   -H "Content-Type: application/json" \
+  -H "x-api-token: YOUR_PUBLIC_API_TOKEN" \
   -d '{
     "csv_data": "ID,Comment\n1,Great service! Very helpful.\n2,Terrible experience. Very disappointed.",
     "column": "Comment",
@@ -32,4 +33,3 @@ echo '  "rows_processed": 2,'
 echo '  "csv_output": "ID,Comment,AI_Tags,Positive,Negative\n1,Great service!...,Positive,1,0\n2,Terrible...,Negative,0,1",'
 echo '  "tags_applied": ["Positive", "Negative"]'
 echo '}'
-

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Data Tagger</title>
+  <desc id="desc">AI survey response tagging workflow with CSV upload, tag definition, AI processing, and export.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#1f2937" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect x="48" y="48" width="1104" height="534" rx="20" fill="#ffffff" stroke="#d1d5db" />
+
+  <rect x="48" y="48" width="1104" height="84" rx="20" fill="url(#accent)" />
+  <text x="96" y="102" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="700" fill="#ffffff">Data Tagger</text>
+  <text x="390" y="102" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="400" fill="#cbd5e1">AI Survey Response Tagging Tool</text>
+
+  <rect x="96" y="176" width="300" height="56" rx="8" fill="#f9fafb" stroke="#d1d5db" />
+  <text x="116" y="211" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="600" fill="#111827">1 Upload CSV</text>
+
+  <rect x="440" y="176" width="300" height="56" rx="8" fill="#f9fafb" stroke="#d1d5db" />
+  <text x="460" y="211" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="600" fill="#111827">2 Define Tags</text>
+
+  <rect x="784" y="176" width="320" height="56" rx="8" fill="#f9fafb" stroke="#d1d5db" />
+  <text x="804" y="211" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="600" fill="#111827">3 Run + Export</text>
+
+  <rect x="96" y="266" width="1008" height="248" rx="12" fill="#f8fafc" stroke="#d1d5db" />
+
+  <rect x="128" y="302" width="260" height="34" rx="6" fill="#e5e7eb" />
+  <rect x="128" y="352" width="456" height="18" rx="4" fill="#d1d5db" />
+  <rect x="128" y="382" width="430" height="18" rx="4" fill="#d1d5db" />
+  <rect x="128" y="412" width="390" height="18" rx="4" fill="#d1d5db" />
+
+  <rect x="636" y="300" width="436" height="182" rx="10" fill="#ffffff" stroke="#cbd5e1" />
+  <rect x="660" y="326" width="390" height="24" rx="6" fill="#111827" />
+  <text x="676" y="344" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff">Positive Feedback, Feature Request</text>
+  <rect x="660" y="366" width="236" height="16" rx="4" fill="#9ca3af" />
+  <rect x="660" y="392" width="322" height="16" rx="4" fill="#9ca3af" />
+  <rect x="660" y="418" width="180" height="16" rx="4" fill="#9ca3af" />
+
+  <text x="96" y="560" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="600" fill="#111827">Tag survey data with your model provider. Process locally. Export clean results.</text>
+</svg>

@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /api/
 
-Sitemap: https://data-tagger.vercel.app/sitemap.xml
+Sitemap: https://data-tagger.com/sitemap.xml
 

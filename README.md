@@ -86,8 +86,9 @@ The built files will be in the `dist/` directory, ready for deployment.
 Perfect for Zapier, Make, n8n, or custom integrations:
 
 ```bash
-curl -X POST https://data-tagger.vercel.app/api/tag \
+curl -X POST https://data-tagger.com/api/tag \
   -H "Content-Type: application/json" \
+  -H "x-api-token: YOUR_PUBLIC_API_TOKEN" \
   -d '{
     "csv_data": "ID,Comment\n1,Great service!",
     "column": "Comment",

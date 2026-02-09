@@ -1,17 +1,21 @@
 # Data Tagger API Documentation
 
-The Data Tagger API is a **public, free-to-use** endpoint that allows you to automate survey response tagging through Zapier, Make, n8n, or any HTTP client.
+The Data Tagger API is a **token-protected** endpoint that allows you to automate survey response tagging through Zapier, Make, n8n, or any HTTP client.
 
 ## 🚀 Quick Start
 
 ### Base URL
 ```
-https://data-tagger.vercel.app/api/tag
+https://data-tagger.com/api/tag
 ```
 *(Replace with the actual deployed URL)*
 
 ### Authentication
-**No authentication required!** This is a public API.
+API token authentication is required in production.
+
+Set a server-side `PUBLIC_API_TOKEN`, then send one of:
+- `Authorization: Bearer YOUR_PUBLIC_API_TOKEN`
+- `x-api-token: YOUR_PUBLIC_API_TOKEN`
 
 Your AI provider API key is passed in the request body and used only during processing - it's never stored.
 
@@ -37,6 +41,7 @@ Process CSV data with AI tagging.
 **Request Headers:**
 ```
 Content-Type: application/json
+x-api-token: YOUR_PUBLIC_API_TOKEN
 ```
 
 **Request Body:**
@@ -184,8 +189,9 @@ Response ID,Date,Comment,AI_Tags,Positive,Negative
 
 ### cURL Example
 ```bash
-curl -X POST https://data-tagger.vercel.app/api/tag \
+curl -X POST https://data-tagger.com/api/tag \
   -H "Content-Type: application/json" \
+  -H "x-api-token: YOUR_PUBLIC_API_TOKEN" \
   -d '{
     "csv_data": "ID,Comment\n1,Great service!\n2,Terrible experience",
     "column": "Comment",
@@ -206,10 +212,11 @@ curl -X POST https://data-tagger.vercel.app/api/tag \
 
 ### JavaScript Example
 ```javascript
-const response = await fetch('https://data-tagger.vercel.app/api/tag', {
+const response = await fetch('https://data-tagger.com/api/tag', {
   method: 'POST',
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'x-api-token': process.env.PUBLIC_API_TOKEN
   },
   body: JSON.stringify({
     csv_data: "ID,Comment\n1,Great service!",
@@ -233,9 +240,10 @@ console.log(result.csv_output)
 import requests
 
 response = requests.post(
-    'https://data-tagger.vercel.app/api/tag',
+    'https://data-tagger.com/api/tag',
     headers={
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-api-token': os.environ['PUBLIC_API_TOKEN']
     },
     json={
         'csv_data': 'ID,Comment\n1,Great service!',

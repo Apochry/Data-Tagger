@@ -96,7 +96,7 @@ Run these tests before going live:
 
 ```bash
 # Test 1: Single row tagging
-curl -X POST https://data-tagger.vercel.app/api/tag \
+curl -X POST https://data-tagger.com/api/tag \
   -H "Content-Type: application/json" \
   -d '{
     "csv_data": "ID,Comment\n1,Great service!",
@@ -112,7 +112,7 @@ curl -X POST https://data-tagger.vercel.app/api/tag \
 # Test 2: Rate limiting (run 11 times quickly)
 # Run this 11 times to test rate limiting
 for i in {1..11}; do 
-  curl -X POST https://data-tagger.vercel.app/api/tag \
+  curl -X POST https://data-tagger.com/api/tag \
     -H "Content-Type: application/json" \
     -d '{
       "csv_data": "ID,C\n1,test",
@@ -125,7 +125,7 @@ for i in {1..11}; do
 done
 
 # Test 3: Validation errors
-curl -X POST https://data-tagger.vercel.app/api/tag \
+curl -X POST https://data-tagger.com/api/tag \
   -H "Content-Type: application/json" \
   -d '{"csv_data": "test"}'
 
@@ -134,9 +134,10 @@ curl -X POST https://data-tagger.vercel.app/api/tag \
 ```
 
 ### 2. Environment Variables
-No environment variables needed! 
-- ✅ Public API (no API_SECRET required)
-- ✅ Users provide their own AI keys
+Required for API protection:
+- PUBLIC_API_TOKEN must be set in production
+- Clients must send x-api-token (or Authorization: Bearer ...)
+- Users still provide their own AI provider keys per request
 
 ### 3. Vercel Deployment
 ```bash
@@ -151,7 +152,7 @@ vercel --prod
 ```
 
 ### 4. Post-Deployment Verification
-- [ ] Visit https://data-tagger.vercel.app
+- [ ] Visit https://data-tagger.com
 - [ ] Test web interface works
 - [ ] Test Zapier modal opens
 - [ ] Test API endpoint responds
@@ -333,4 +334,5 @@ vercel --prod
 **Last Updated**: October 2025
 **Reviewed By**: AI Code Review
 **Next Review**: After first 100 API requests
+
 

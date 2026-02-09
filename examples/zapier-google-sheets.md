@@ -84,7 +84,7 @@ output = {
 #### Action 2: Webhooks by Zapier (Call API)
 - **App**: Webhooks by Zapier
 - **Event**: POST
-- **URL**: `https://data-tagger.vercel.app/api/tag`
+- **URL**: `https://data-tagger.com/api/tag`
 - **Payload Type**: JSON
 - **Data**:
   - csv_data: (from Code step output)
@@ -95,6 +95,7 @@ output = {
   - ai_model: (from Code step output)
 - **Headers**:
   - Content-Type: `application/json`
+  - x-api-token: `{{storage.data_tagger_api_token}}`
 - **Wrap Request In Array**: No
 
 **Important formatting tips**
@@ -112,7 +113,7 @@ output = {
   ```
 - If your source value doesn’t already include a newline, add a Formatter → Text → Append step to build `Header\nValue` before the webhook call.
 
-**Note**: No authentication headers needed - this is a public API!
+**Note**: API token auth is required. Set `PUBLIC_API_TOKEN` in your deployment and pass the same value in `x-api-token`.
 
 #### Action 3: Formatter by Zapier (Import CSV)
 - **App**: Formatter by Zapier

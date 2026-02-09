@@ -32,7 +32,7 @@ export default function ModelSelectionStep({ onComplete, csvData, selectedColumn
     },
   ]
 
-  // Estimate token count (rough approximation: 1 token ≈ 4 characters for English)
+  // Estimate token count (rough approximation: 1 token ~= 4 characters for English)
   const estimateTokens = (text) => {
     return Math.ceil(text.length / 4)
   }
@@ -43,7 +43,7 @@ export default function ModelSelectionStep({ onComplete, csvData, selectedColumn
       return
     }
 
-    console.log(`🔍 Fetching available models from ${provider}...`)
+    console.log(`[models] Fetching available models from ${provider}...`)
     setIsLoadingModels(true)
     setModelsError(null)
     setHasAttemptedLoad(true)
@@ -65,7 +65,7 @@ export default function ModelSelectionStep({ onComplete, csvData, selectedColumn
           throw new Error('Unknown provider')
       }
 
-      console.log('✅ Formatted models:', modelList.map(m => m.id))
+      console.log('[models] Formatted models:', modelList.map(m => m.id))
       
       if (modelList.length === 0) {
         setModelsError('No compatible models found. Please check your API key.')
@@ -75,7 +75,7 @@ export default function ModelSelectionStep({ onComplete, csvData, selectedColumn
       
       setIsLoadingModels(false)
     } catch (error) {
-      console.error('❌ Error fetching models:', error)
+      console.error('[error] Error fetching models:', error)
       setModelsError(`Failed to load models: ${error.message}`)
       setIsLoadingModels(false)
       setModels([])
@@ -118,7 +118,7 @@ export default function ModelSelectionStep({ onComplete, csvData, selectedColumn
     const data = await response.json()
     const modelList = data.models || []
     
-    console.log('📋 Raw models received:', modelList)
+    console.log('[models] Raw models received:', modelList)
 
     return modelList
       .filter(model => {
@@ -174,7 +174,7 @@ export default function ModelSelectionStep({ onComplete, csvData, selectedColumn
     }
 
     const data = await response.json()
-    console.log('📋 Raw models received:', data.data?.length || 0)
+    console.log('[models] Raw models received:', data.data?.length || 0)
     
     return (data.data || []).map(model => ({
       id: model.id,
@@ -197,7 +197,7 @@ export default function ModelSelectionStep({ onComplete, csvData, selectedColumn
     }
 
     const data = await response.json()
-    console.log('📋 Raw models received:', data.data?.length || 0)
+    console.log('[models] Raw models received:', data.data?.length || 0)
     
     // Filter to chat/completion models only
     return (data.data || [])
@@ -237,7 +237,7 @@ export default function ModelSelectionStep({ onComplete, csvData, selectedColumn
       return null
     }
 
-    console.log('🔢 Calculating token estimate...')
+    console.log('[tokens] Calculating token estimate...')
 
     const tagDefinitions = tags
       .map((tag, index) => {
@@ -284,7 +284,7 @@ YOUR RESPONSE (comma-separated tag names only):`
     const totalInputTokens = inputTokensPerRequest * csvData.length
     const totalOutputTokens = outputTokensPerRequest * csvData.length
 
-    console.log('📊 Token Estimate:', {
+    console.log('[tokens] Token estimate:', {
       promptTokens,
       avgCommentTokens,
       inputTokensPerRequest,
@@ -401,7 +401,7 @@ YOUR RESPONSE (comma-separated tag names only):`
               onClick={() => setProvider('')}
               className="px-4 py-2 border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors rounded-sm"
             >
-              ← Change Provider
+              {'<- Change Provider'}
             </button>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-900">
@@ -487,7 +487,7 @@ YOUR RESPONSE (comma-separated tag names only):`
             {/* Error State */}
             {modelsError && !isLoadingModels && (
               <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-sm mb-4">
-                <p className="text-yellow-800 font-medium">⚠️ {modelsError}</p>
+                <p className="text-yellow-800 font-medium">Warning: {modelsError}</p>
               </div>
             )}
 

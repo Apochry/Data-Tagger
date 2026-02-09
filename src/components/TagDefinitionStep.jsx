@@ -3,13 +3,21 @@ import TagImportModal from './TagImportModal'
 import TagReorderModal from './TagReorderModal'
 
 export default function TagDefinitionStep({ onComplete, initialTags, onClearAll }) {
+  const createId = () => {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID()
+    }
+    return `tag_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+  }
+
   const normalizeTag = (tag) => ({
     ...tag,
+    id: tag.id || createId(),
     examples: Array.isArray(tag.examples) ? tag.examples : [],
   })
 
   const createEmptyTag = () => ({
-    id: Date.now(),
+    id: createId(),
     name: '',
     description: '',
     examples: [],
@@ -18,10 +26,10 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
   const [tags, setTags] = useState(() => {
     // Use initialTags if provided and not empty, otherwise use default empty tag
     if (initialTags && initialTags.length > 0) {
-      console.log('📋 Loading saved tags from localStorage:', initialTags.length, 'tags')
+      console.log('[storage] Loading saved tags from localStorage:', initialTags.length, 'tags')
       return initialTags.map(normalizeTag)
     }
-    console.log('📋 Starting with empty tag template')
+    console.log('[storage] Starting with empty tag template')
     return [createEmptyTag()]
   })
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
@@ -34,7 +42,7 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
     // Only save if there's at least one tag with a name (don't save empty template)
     const hasContent = tags.some(tag => tag.name.trim() !== '' || tag.description.trim() !== '' || tag.examples.some(ex => ex.trim() !== ''))
     if (hasContent) {
-      console.log('💾 Autosaving tags to localStorage:', tags.length, 'tags')
+      console.log('[storage] Autosaving tags to localStorage:', tags.length, 'tags')
       localStorage.setItem('aiTagger_tags', JSON.stringify(tags))
     }
   }, [tags])
@@ -52,7 +60,7 @@ export default function TagDefinitionStep({ onComplete, initialTags, onClearAll 
       ...tags,
       {
         ...tagToDuplicate,
-        id: Date.now(),
+        id: createId(),
       },
     ])
   }

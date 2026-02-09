@@ -4,7 +4,7 @@
  * POST /api/tag
  * 
  * This is a PUBLIC serverless endpoint for CSV tagging automation.
- * No authentication required - rate limited by IP address.
+ * Token-authenticated endpoint (production) with IP rate limiting.
  * 
  * Security model:
  * - No API keys stored on server
@@ -19,6 +19,7 @@ import Papa from 'papaparse'
 
 // Rate limiting storage (in-memory for simplicity, use Redis for production)
 const requestCounts = new Map()
+const PUBLIC_API_TOKEN = process.env.PUBLIC_API_TOKEN?.trim()
 
 function maskApiKey(key) {
   if (!key || typeof key !== 'string') {
@@ -30,6 +31,20 @@ function maskApiKey(key) {
   }
 
   return `${key.slice(0, 4)}...${key.slice(-4)}`
+}
+
+function getRequestToken(req) {
+  const authHeader = req.headers.authorization
+  if (typeof authHeader === 'string' && authHeader.toLowerCase().startsWith('bearer ')) {
+    return authHeader.slice(7).trim()
+  }
+
+  const apiTokenHeader = req.headers['x-api-token']
+  if (typeof apiTokenHeader === 'string') {
+    return apiTokenHeader.trim()
+  }
+
+  return ''
 }
 
 // Rate limiter
@@ -168,7 +183,7 @@ async function callOpenRouter(apiKey, model, prompt) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
-      'HTTP-Referer': 'https://data-tagger.vercel.app',
+      'HTTP-Referer': 'https://data-tagger.com',
       'X-Title': 'Data Tagger API'
     },
     body: JSON.stringify({
@@ -219,7 +234,9 @@ async function processCSVData(csvData, column, tags, provider, apiKey, model) {
             throw new Error('CSV contains too many rows (max 10,000)')
           }
 
-          if (!data[0][column]) {
+          const firstRow = data[0] || {}
+          const columnExists = Object.prototype.hasOwnProperty.call(firstRow, column)
+          if (!columnExists) {
             throw new Error(`Column "${column}" not found in CSV`)
           }
 
@@ -323,11 +340,14 @@ export default async function handler(req, res) {
   res.setHeader('X-Content-Type-Options', 'nosniff')
   res.setHeader('X-Frame-Options', 'DENY')
   res.setHeader('X-XSS-Protection', '1; mode=block')
+  // Keep API endpoints out of search indexes and snippets.
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet')
+  res.setHeader('Cache-Control', 'no-store')
   
   // CORS - allow anyone to use the API (public endpoint)
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-token')
 
   // Handle OPTIONS request (CORS preflight)
   if (req.method === 'OPTIONS') {
@@ -340,6 +360,28 @@ export default async function handler(req, res) {
       error: 'Method not allowed',
       message: 'Only POST requests are accepted' 
     })
+  }
+
+  // API authentication: require a shared token in production.
+  // Supported headers:
+  // - Authorization: Bearer <token>
+  // - x-api-token: <token>
+  if (process.env.NODE_ENV === 'production') {
+    if (!PUBLIC_API_TOKEN) {
+      console.error('PUBLIC_API_TOKEN is not configured in production.')
+      return res.status(503).json({
+        error: 'Service unavailable',
+        message: 'API authentication is not configured.',
+      })
+    }
+
+    const providedToken = getRequestToken(req)
+    if (!providedToken || providedToken !== PUBLIC_API_TOKEN) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Missing or invalid API token.',
+      })
+    }
   }
 
   try {
@@ -385,29 +427,42 @@ export default async function handler(req, res) {
     }
 
     const csvString = typeof body.csv_data === 'string' ? body.csv_data : ''
-    const csvPreview = csvString ? csvString.slice(0, 500) : undefined
     const csvLines = csvString ? csvString.split('\n').length : undefined
+    const isProduction = process.env.NODE_ENV === 'production'
 
-    const sanitizedBodyForLog = {
-      ...body,
-      ai_api_key: maskApiKey(body.ai_api_key),
-      csv_data: csvPreview,
+    if (isProduction) {
+      console.log('Incoming /api/tag request', {
+        received_at: new Date().toISOString(),
+        ip: identifier,
+        method: req.method,
+        column: body.column,
+        csv_rows: csvLines,
+        tags_count: body.tags.length,
+        ai_provider: body.ai_provider,
+        ai_model: body.ai_model,
+      })
+    } else {
+      const csvPreview = csvString ? csvString.slice(0, 500) : undefined
+      const sanitizedBodyForLog = {
+        ...body,
+        ai_api_key: maskApiKey(body.ai_api_key),
+        csv_data: csvPreview,
+      }
+
+      console.log('Full Parsed Body:', sanitizedBodyForLog)
+      console.log('Incoming /api/tag request', {
+        received_at: new Date().toISOString(),
+        ip: identifier,
+        method: req.method,
+        column: body.column,
+        csv_rows: csvLines,
+        tags_count: body.tags.length,
+        ai_provider: body.ai_provider,
+        ai_model: body.ai_model,
+        ai_api_key_masked: maskApiKey(body.ai_api_key),
+        csv_data_preview: csvPreview,
+      })
     }
-
-    console.log('Full Parsed Body:', sanitizedBodyForLog)
-
-    console.log('Incoming /api/tag request', {
-      received_at: new Date().toISOString(),
-      ip: identifier,
-      method: req.method,
-      column: body.column,
-      csv_rows: csvLines,
-      tags_count: body.tags.length,
-      ai_provider: body.ai_provider,
-      ai_model: body.ai_model,
-      ai_api_key_masked: maskApiKey(body.ai_api_key),
-      csv_data_preview: csvPreview,
-    })
 
     console.log(`Successfully validated ${body.tags.length} tags.`)
 

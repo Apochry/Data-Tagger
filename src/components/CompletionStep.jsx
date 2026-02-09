@@ -115,7 +115,7 @@ export default function CompletionStep({ processedData, tags }) {
         <div className="mb-10 rounded-sm border border-dashed border-gray-300 bg-gray-50 px-6 py-8 text-center">
           <h3 className="text-lg font-semibold text-gray-900">Download tagged results when ready</h3>
           <p className="mt-2 text-sm text-gray-600">
-            Once your data is processed, you’ll see the statistics breakdown and can export the tagged CSV here.
+            Once your data is processed, you'll see the statistics breakdown and can export the tagged CSV here.
           </p>
         </div>
       )}

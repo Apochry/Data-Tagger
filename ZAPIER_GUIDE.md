@@ -52,7 +52,7 @@ Choose one provider:
 **Action:**
 - App: Webhooks by Zapier
 - Event: POST
-- URL: `https://your-app.vercel.app/api/tag`
+- URL: `https://data-tagger.com/api/tag`
 - Payload Type: JSON
 - Data:
   ```
@@ -66,8 +66,9 @@ Choose one provider:
 - Headers:
   ```
   Content-Type: application/json
+  x-api-token: {{storage.data_tagger_api_token}}
   ```
-  *(That's it! No authentication needed)*
+  *(API token required in production)*
 
 ### Constructing CSV Data
 

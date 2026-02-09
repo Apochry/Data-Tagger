@@ -4,11 +4,13 @@
  * Usage:
  * 1. Set environment variables:
  *    - GEMINI_API_KEY (get free key at https://aistudio.google.com/app/apikey)
+ *    - PUBLIC_API_TOKEN (must match your deployment's PUBLIC_API_TOKEN)
  * 2. Run: node examples/test-api.js
  */
 
-const API_URL = 'https://data-tagger.vercel.app/api/tag'
+const API_URL = 'https://data-tagger.com/api/tag'
 const AI_API_KEY = process.env.GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY'
+const PUBLIC_API_TOKEN = process.env.PUBLIC_API_TOKEN || 'YOUR_PUBLIC_API_TOKEN'
 
 // Get your free Gemini API key at: https://aistudio.google.com/app/apikey
 
@@ -74,7 +76,7 @@ async function testAPI() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Secret': API_SECRET
+        'x-api-token': PUBLIC_API_TOKEN
       },
       body: JSON.stringify(requestBody)
     })

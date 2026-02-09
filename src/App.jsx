@@ -8,6 +8,17 @@ import CompletionStep from './components/CompletionStep'
 import FloatingActions from './components/FloatingActions'
 
 function App() {
+  const safeParseJSON = (value, fallback) => {
+    if (!value) return fallback
+
+    try {
+      return JSON.parse(value)
+    } catch (error) {
+      console.warn('Failed to parse persisted app state. Falling back to default.', error)
+      return fallback
+    }
+  }
+
   // Load initial state from localStorage
   const [currentStep, setCurrentStep] = useState(() => {
     const saved = localStorage.getItem('aiTagger_currentStep')
@@ -16,7 +27,7 @@ function App() {
   
   const [csvData, setCsvData] = useState(() => {
     const saved = localStorage.getItem('aiTagger_csvData')
-    return saved ? JSON.parse(saved) : null
+    return safeParseJSON(saved, null)
   })
   
   const [selectedColumn, setSelectedColumn] = useState(() => {
@@ -30,8 +41,8 @@ function App() {
   
   const [tags, setTags] = useState(() => {
     const saved = localStorage.getItem('aiTagger_tags')
-    const parsed = saved ? JSON.parse(saved) : []
-    console.log('💾 Loading tags from localStorage:', parsed.length, 'tags found')
+    const parsed = safeParseJSON(saved, [])
+    console.log('[storage] Loading tags from localStorage:', parsed.length, 'tags found')
     return parsed
   })
   
@@ -79,7 +90,7 @@ function App() {
 
   useEffect(() => {
     if (tags.length > 0) {
-      console.log('💾 Saving tags to localStorage:', tags.length, 'tags')
+      console.log('[storage] Saving tags to localStorage:', tags.length, 'tags')
       localStorage.setItem('aiTagger_tags', JSON.stringify(tags))
     }
   }, [tags])
